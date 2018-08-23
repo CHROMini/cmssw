@@ -1,0 +1,163 @@
+<?xml version="1.0"?>
+
+<DDDefinition xmlns="http://www.cern.ch/cms/DDL" xmlns:xsi="http://www.cern.ch/www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.cern.ch/cms/DDL ../../../DetectorDescription/Schema/DDLSchema.xsd">
+
+
+  <!-- CONSTANTS -->
+  <!-- Should not need to change this. -->
+  <!-- Renaming phase 1 modules constants for clarity. -->
+  <ConstantsSection label="telescope.xml" eval="true">
+    <Constant name="Phase1BPIXModuleWidth" value="[Phase1BPIXLayer4Module:LadderWidth]"/>                                   <!-- = 24.5 mm, sensor active is 16.2 mm for Phase1 -->
+    <Constant name="Phase1BPIXModuleLength" value="[Phase1BPIXLayer4Module:ModuleDz]"/>                                     <!-- = 67.0 mm, sensor active is 64.8 mm for Phase1 -->
+    <Constant name="Phase1BPIXModuleThickness" value="[Phase1BPIXLayer4Module:Module23Thick]"/>                             <!-- = 1.28 mm, sensor active is 0.285 mm for Phase1 -->
+  </ConstantsSection>
+
+
+
+  <!-- ROTATIONS -->
+  <!-- Should not need to change this. -->
+  <RotationSection label="telescope.xml">
+    <!-- DUT -->
+    <Rotation name="Z90" phiX="90.*deg" thetaX="90.*deg" phiY="180.*deg" thetaY="90.*deg" phiZ="0.*deg" thetaZ="0.*deg"/> <!-- Rotation of 90 deg around Z axis. -->
+
+    <Rotation name="DUTSkewMinus" thetaX="90*deg" phiX="0*deg" thetaY="90*deg+[tuneParameters:DUTSkewAngle]" phiY="90*deg" thetaZ="[tuneParameters:DUTSkewAngle]" phiZ="90*deg"/>
+    <Rotation name="DUTSkewPlus" thetaX="90*deg" phiX="0*deg" thetaY="90*deg-[tuneParameters:DUTSkewAngle]" phiY="90*deg" thetaZ="[tuneParameters:DUTSkewAngle]" phiZ="270*deg"/>
+    <Rotation name="PlaceDUTInDUTHolder" thetaX="90*deg" phiX="90*deg" thetaY="90*deg" phiY="180*deg" thetaZ="0*deg" phiZ="0*deg"/>
+
+    <!-- FLIP PHASE 1 MODULE -->
+    <Rotation name="Z180" phiX="180.*deg" thetaX="90.*deg" phiY="270.*deg" thetaY="90.*deg" phiZ="0.*deg" thetaZ="0.*deg"/> <!-- Rotation of 180 deg around Z axis. -->
+    <!-- In Phase 1 BPIX module, local Z axis is along the sensor length direction. -->
+    <!-- Hence, this transformation is a flip along the sensor length direction. -->
+  </RotationSection>
+
+
+
+  <!-- SHAPES -->
+  <SolidSection label="telescope.xml">
+    <Box name="BeamArea" dx="2.0*m" dy="2.0*m" dz="5.0*m"/>
+    <Box name="Telescope" dx="500.0*mm" dy="300.0*mm" dz="1000.0*mm"/>
+    <Box name="DUTContainer" dx="260.0*mm" dy="180.0*mm" dz="73.0*mm"/>
+    <Box name="DUTLayer" dx="260.0*mm" dy="180.0*mm" dz="73.0*mm"/>
+    <Box name="DUTHolder" dx="260.0*mm" dy="160.0*mm" dz="20.0*mm"/>
+    <Box name="Arm" dx="100.0*mm" dy="70.0*mm" dz="150.0*mm"/>
+    <Box name="Plane" dx="[Phase1BPIXModuleWidth]" dy="2.*[Phase1BPIXModuleThickness]" dz="[Phase1BPIXModuleLength]/2.0"/>
+  </SolidSection>
+
+
+
+  <!-- MATERIALS -->
+  <LogicalPartSection label="telescope.xml">
+    <LogicalPart name="World" category="unspecified">
+      <rSolid name="telescope:BeamArea"/>
+      <rMaterial name="materials:Air"/>
+    </LogicalPart>
+    <LogicalPart name="BeamArea" category="unspecified">
+      <rSolid name="telescope:BeamArea"/>
+      <rMaterial name="materials:Air"/>
+    </LogicalPart>
+    <LogicalPart name="Telescope" category="unspecified">
+      <rSolid name="telescope:Telescope"/>
+      <rMaterial name="materials:Air"/>
+    </LogicalPart>
+    <LogicalPart name="DUTContainer" category="unspecified">
+      <rSolid name="telescope:DUTContainer"/>
+      <rMaterial name="materials:Air"/>
+    </LogicalPart>
+    <LogicalPart name="DUTLayer" category="unspecified">
+      <rSolid name="telescope:DUTLayer"/>
+      <rMaterial name="materials:Air"/>
+    </LogicalPart>
+    <LogicalPart name="DUTHolder" category="unspecified">
+      <rSolid name="telescope:DUTHolder"/>
+      <rMaterial name="materials:Air"/>
+    </LogicalPart>
+    <LogicalPart name="Arm" category="unspecified">
+      <rSolid name="telescope:Arm"/>
+      <rMaterial name="materials:Air"/>
+    </LogicalPart>
+    <LogicalPart name="Plane" category="unspecified">
+      <rSolid name="telescope:Plane"/>
+      <rMaterial name="materials:Air"/>
+    </LogicalPart>
+  </LogicalPartSection>
+
+
+
+  <!-- POSITIONING -->
+  <PosPartSection label="telescope.xml">
+    <PosPart copyNumber="1">
+      <rParent name="telescope:World"/>
+      <rChild name="telescope:BeamArea"/>
+    </PosPart>
+
+    <!-- PLACE TELESCOPE MOTHER VOLUME -->
+    <PosPart copyNumber="1">
+      <rParent name="telescope:BeamArea"/>
+      <rChild name="telescope:Telescope"/>
+    </PosPart>
+
+    <!-- PLACE ARMS WITHIN TELESCOPE -->
+    <PosPart copyNumber="1">
+      <rParent name="telescope:Telescope"/>
+      <rChild name="telescope:Arm"/>
+      <Translation x="0.0*mm" y="0.0*mm" z="[tuneParameters:InterArmDeltaZ]/2.0"/>
+    </PosPart>
+    <PosPart copyNumber="2">
+      <rParent name="telescope:Telescope"/>
+      <rChild name="telescope:Arm"/>
+      <Translation x="0.0*mm" y="0.0*mm" z="-[tuneParameters:InterArmDeltaZ]/2.0"/>
+    </PosPart>
+
+    <!-- PLACE PLANES WITHIN ARM -->
+    <Algorithm name="phase2TestBeam:DDTelescopePlanesAlgo">
+      <rParent name="telescope:Arm"/>
+      <String name="ChildName" value="telescope:Plane"/>
+      <Numeric name="N" value="4"/>
+      <Numeric name="tiltAngle" value="[tuneParameters:PlaneTiltAngle]"/>
+      <Numeric name="skewAngle" value="[tuneParameters:PlaneSkewAngle]"/>
+      <Numeric name="deltaZ" value="[tuneParameters:InterPlaneDeltaZ]"/>
+    </Algorithm>
+
+    <!-- PLACE PHASE1 MODULES WITHIN PLANE --> 
+    <PosPart copyNumber="1">
+      <rParent name="telescope:Plane"/>
+      <rChild name="Phase1BPIXLayer4Module:PixelBarrelModuleFullPlus"/>
+      <Translation x="-[tuneParameters:MovePhase1ModuleInPlaneAlongModuleWidth]/2.0" y="[tuneParameters:MovePhase1ModuleInPlaneAlongModuleThickness]/2.0" z="0.0*mm"/>
+    </PosPart>
+    <PosPart copyNumber="2">
+      <rParent name="telescope:Plane"/>
+      <rChild name="Phase1BPIXLayer4Module:PixelBarrelModuleFullPlus"/>   
+      <rRotation name="telescope:Z180"/>   
+      <Translation x="[tuneParameters:MovePhase1ModuleInPlaneAlongModuleWidth]/2.0" y="-[tuneParameters:MovePhase1ModuleInPlaneAlongModuleThickness]/2.0" z="0.0*mm"/>
+    </PosPart>
+
+    <!-- PLACE DUT WITHIN TELESCOPE -->
+    <PosPart copyNumber="1">
+      <rParent name="telescope:Telescope"/>
+      <rChild name="telescope:DUTContainer"/>
+      <rRotation name="telescope:Z90"/>
+    </PosPart>
+
+    <PosPart copyNumber="1">
+      <rParent name="telescope:DUTContainer"/>
+      <rChild name="telescope:DUTLayer"/>          
+    </PosPart>
+
+    <PosPart copyNumber="1">
+      <rParent name="telescope:DUTLayer"/>
+      <rChild name="telescope:DUTHolder"/>
+      <rRotation name="telescope:DUTSkewMinus"/>
+      <Translation x="[tuneParameters:DUTTransX]" y="[tuneParameters:DUTTransY]" z="[tuneParameters:DUTTransZ]"/>
+    </PosPart>
+
+    <PosPart copyNumber="1">
+      <rParent name="telescope:DUTHolder"/>
+      <rRotation name="telescope:PlaceDUTInDUTHolder"/>
+      <rChild name="DUT:BModule1Layer6"/>
+    </PosPart>
+
+  </PosPartSection>
+
+
+</DDDefinition>
+

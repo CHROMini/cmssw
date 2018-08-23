@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<DDDefinition xmlns="http://www.cern.ch/cms/DDL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.cern.ch/cms/DDL ../../../DetectorDescription/Schema/DDLSchema.xsd">
+  <SpecParSection label="pixelTelescopeRecoMaterial.xml">
+
+    <!-- PHASE 1 PIXEL SENSORS -->
+    <SpecPar eval="true" name="TrackerRecMaterialPixelBarrelLayer3">
+      <PartSelector path="//telescope:Telescope/telescope:Arm/telescope:Plane/Phase1BPIXLayer4Module:PixelBarrelModuleFullPlus/Phase1BPIXLayer4Module:PixelBarrelSensorFull/Phase1BPIXLayer4Module:PixelBarrelActiveFull3" />
+      <Parameter name="TrackerRadLength" value="0.0211882" />   <!-- TO DO : Are values correct? (present values from Phase 1 description) --> 
+      <Parameter name="TrackerXi" value="4.4212e-05" />
+    </SpecPar>
+
+
+    <!-- DUT -->
+    <!-- UNCOMMENT THIS TO ADD DUT.
+	 <SpecPar name="pixelTelescopeRecoMaterialDUT" eval="true">
+	 <PartSelector path="//telescope:Telescope/telescope:DUTContainer/telescope:DUTHolder/DUT:BModule1Layer6/DUT:BModule1Layer6Lowerwafer/DUT:BModule1Layer6Lower2Sactive"/>
+	 <PartSelector path="//telescope:Telescope/telescope:DUTContainer/telescope:DUTHolder/DUT:BModule1Layer6/DUT:BModule1Layer6Upperwafer/DUT:BModule1Layer6Upper2Sactive"/>
+	 <Parameter name="TrackerRadLength" value="0.0161855"/>
+	 <Parameter name="TrackerXi" value="3.2371e-05"/>
+	 </SpecPar>
+    -->
+
+  </SpecParSection>
+</DDDefinition>

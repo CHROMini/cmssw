@@ -1,0 +1,88 @@
+<?xml version="1.0"?>
+
+<DDDefinition xmlns="http://www.cern.ch/cms/DDL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.cern.ch/cms/DDL ../../../DetectorDescription/Schema/DDLSchema.xsd">
+  <SpecParSection label="pixelTelescopeTopology.xml">
+
+
+    <!-- TELESCOPE VOLUME -->
+    <SpecPar name="TelescopePar">
+      <PartSelector path="//telescope:Telescope" />
+      <Parameter name="TkDDDStructure" value="FullTracker"/>
+    </SpecPar>
+
+
+
+    <!-- TELESCOPE ARMS, PLANES AND PHASE 1 PIXELS -->
+    <SpecPar name="ArmPar">
+      <PartSelector path="//telescope:Arm"/>
+      <Parameter name="TkDDDStructure" value="PixelPhase1EndcapSubDet"/>
+    </SpecPar>
+
+    <SpecPar name="PlanePar">
+      <PartSelector path="//telescope:Plane"/>
+      <Parameter name="TkDDDStructure" value="PixelPhase1EndcapDisk"/>
+    </SpecPar>
+
+    <SpecPar name="Phase1PixelFullSensorPar">
+      <PartSelector path="//Phase1BPIXLayer4Module:PixelBarrelSensorFull"/>
+      <Parameter name="TkDDDStructure" value="PixelEndcapPanel"/>
+    </SpecPar>
+
+    <SpecPar name="Phase1PixelSensorActivePar">
+      <PartSelector path="//Phase1BPIXLayer4Module:PixelBarrelActiveFull3"/>              
+      <Parameter name="TkDDDStructure" value="PixelEndcapDet"/>
+      <Parameter name="PixelROCRows" value="80"/>
+      <Parameter name="PixelROCCols" value="52"/>
+      <Parameter name="PixelROC_X" value="2"/>
+      <Parameter name="PixelROC_Y" value="8"/>
+    </SpecPar>
+
+
+
+    <!-- DUT HOLDER AND DUT -->
+    <!-- UNCOMMENT THIS TO ADD DUT.
+    <SpecPar name="DUTContainerPar">
+      <PartSelector path="//telescope:DUTContainer"/>
+      <Parameter name="TkDDDStructure" value="Phase2OTBarrel"/>
+    </SpecPar>
+
+    <SpecPar name="DUTLayerPar">
+      <PartSelector path="//telescope:DUTLayer"/>
+      <Parameter name="TkDDDStructure" value="Phase2OTBarrelLayer"/>
+    </SpecPar>
+
+    <SpecPar name="DUTHolderPar">
+      <PartSelector path="//telescope:DUTHolder"/>
+      <Parameter name="TkDDDStructure" value="Phase2OTBarrelPanel"/>
+    </SpecPar>
+
+    <SpecPar name="DUTPar">
+      <PartSelector path="//DUT:BModule1Layer6"/>
+      <Parameter name="TkDDDStructure" value="Phase2OTBarrelStack"/>
+    </SpecPar>
+
+    <SpecPar name="InnerSensor2SActivePar">
+      <PartSelector path="//DUT:BModule1Layer6Lower2Sactive"/>
+      <Parameter name="TkDDDStructure" value="PixelBarrelDet"/>
+      <Parameter name="TrackerLowerDetectors" value="true"/>                
+      <Parameter name="PixelROCRows" value="127"/>
+      <Parameter name="PixelROCCols" value="1"/>
+      <Parameter name="PixelROC_X" value="8"/>
+      <Parameter name="PixelROC_Y" value="2"/>
+    </SpecPar>
+
+    <SpecPar name="OuterSensor2SActivePar">
+      <PartSelector path="//DUT:BModule1Layer6Upper2Sactive"/>
+      <Parameter name="TkDDDStructure" value="PixelBarrelDet"/>
+      <Parameter name="TrackerUpperDetectors" value="true"/>
+      <Parameter name="PixelROCRows" value="127"/>
+      <Parameter name="PixelROCCols" value="1"/>
+      <Parameter name="PixelROC_X" value="8"/>
+      <Parameter name="PixelROC_Y" value="2"/>
+    </SpecPar>
+    -->
+
+
+  </SpecParSection>
+</DDDefinition>
+

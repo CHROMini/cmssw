@@ -1,0 +1,51 @@
+<?xml version="1.0"?>
+
+<DDDefinition xmlns="http://www.cern.ch/cms/DDL" xmlns:xsi="http://www.cern.ch/www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.cern.ch/cms/DDL ../../../DetectorDescription/Schema/DDLSchema.xsd">
+
+  <!-- TUNE THESE PARAMETERS AS MUCH AS YOU WANT ! -->
+
+  <ConstantsSection label="tuneParameters.xml" eval="true">
+
+    <!-- TELESCOPE ARMS AND PLANES: -->
+    <!-- ARM -->
+    <Constant name="InterArmDeltaZ" value="600.0*mm"/>  <!-- Total distance in Z between the centres of the 2 arms --> <!-- Was 350 mm -->
+
+    <!-- PLANE -->
+    <Constant name="InterPlaneDeltaZ" value="50.0*mm"/> <!-- Total distance in Z between the centres of 2 consecutive planes -->
+    <Constant name="PlaneTiltAngle" value="30.0*deg"/>  <!-- Rotation around CMS_X. Angle is counted in the counter-trigonometric sense. Angle = 0 on (XY) plane. -->
+    <Constant name="PlaneSkewAngle" value="20.0*deg"/>  <!-- Rotation around CMS_Y. Angle is counted in the trigonometric sense. Angle = 0 on (XY) plane. -->
+    <!-- NB: "InterPlaneDeltaZ" and "PlaneSkewAngle" must be in [0° 90°]. -->
+    <!-- If one want to invert the trigonometric sense they are counted in (should not at all be needed!), -->
+    <!-- simply uncomment 2 lines in DDTelescopePlanesAlgo as precisely described in plugins/DDTelescopePlanesAlgo.cc -->
+
+    <!-- PHASE 1 MODULE -->                             
+    <Constant name="MovePhase1ModuleInPlaneAlongModuleWidth" value="[telescope:Phase1BPIXModuleWidth] - 7*mm"/>    
+    <!-- Total distance between the centres of the two Phase 1 modules, along module width (module local X). -->
+
+    <Constant name="MovePhase1ModuleInPlaneAlongModuleThickness" value="2*mm"/>
+    <!-- Total distance between the centres of the two Phase 1 modules, along module thickness (module local Y). -->
+
+
+
+    <!-- DUT: -->
+    <!-- DUT translation -->
+    <Constant name="DUTTransX" value="0.0*mm"/>         <!-- Total DUT Holder translation along X axis -->
+    <Constant name="DUTTransY" value="0.0*mm"/>         <!-- Total DUT Holder translation along Y axis -->
+    <Constant name="DUTTransZ" value="0.0*mm"/>         <!-- Total DUT Holder translation along Z axis --> 
+    <!-- TO DO!! Tune this as desire. Please not that 0. might cause issue, -->
+    <!-- as was not expected to have tilted rings at 0. at the first place (minor correction was needed in CMSSW code). -->
+
+    <!-- DUT rotation -->
+    <Constant name="DUTSkewAngle" value="10.0*deg"/>    <!-- Angle around Y, counted from (XY) plane. -->
+    <!-- Angle is in [0 20] deg. -->
+    <!-- No negative value!! -->
+    <!-- If angle >= 0, please use DUTSkewPlus in telescope.xml -->
+    <!-- If angle < 0, please use DUTSkewMinus in telescope.xml -->
+
+
+  </ConstantsSection>
+
+</DDDefinition>
+
+
+

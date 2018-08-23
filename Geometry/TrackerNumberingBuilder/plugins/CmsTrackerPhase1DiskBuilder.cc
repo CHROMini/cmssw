@@ -59,15 +59,19 @@ CmsTrackerPhase1DiskBuilder::PhiPosNegSplit_innerOuter( std::vector< GeometricDe
     }
   }
 
+  unsigned int num_outer = 0;
   for(vector<const GeometricDet*>::const_iterator it=theCompsPosNeg.begin();
       it!=theCompsPosNeg.end();it++){
-    if((**it).rho() > radius_split) theCompsInnerOuter.emplace_back(*it);
+    if((**it).rho() > radius_split) {
+      theCompsInnerOuter.emplace_back(*it);
+      num_outer++;
+    }
   }
   //  std::cout << "num of inner = " << num_inner << " with radius less than " << radius_split << std::endl;
   // now shift outer by one
 
-  std::rotate(theCompsInnerOuter.begin()+num_inner,theCompsInnerOuter.end()-1,theCompsInnerOuter.end());
-  std::rotate(theCompsInnerOuter.begin(),theCompsInnerOuter.begin()+num_inner-1,theCompsInnerOuter.begin()+num_inner);
+  if (num_outer > 0) { std::rotate(theCompsInnerOuter.begin()+num_inner,theCompsInnerOuter.end()-1,theCompsInnerOuter.end()); }
+  if (num_inner > 0) { std::rotate(theCompsInnerOuter.begin(),theCompsInnerOuter.begin()+num_inner-1,theCompsInnerOuter.begin()+num_inner); }
   std::copy(theCompsInnerOuter.begin(), theCompsInnerOuter.end(), begin);
 }
 
