@@ -1,14 +1,7 @@
-// -*- C++ -*-
-//
 // Package:    DQMTelescope/AnaNikkie
 // Class:      AnaNikkie
 //
 // class AnaNikkie AnaNikkie.cc DQMTelescope/AnaNikkie/plugins/AnaNikkie.cc
-
-// Description: [one line class summary]
-
-// Implementation:
-//     [Notes on implementation]
 
 // Original Author:  Jeremy Andrea
 //      Updated by:  Nikkie Deelen
@@ -61,14 +54,9 @@
 // class declaration
 //
 
-// If the analyzer does not use TFileService, please remove
-// the template argument to the base class so the class inherits
-// from  edm::one::EDAnalyzer<>
-// This will improve performance in multithreaded jobs.
-
 using reco::TrackCollection ;
 
-class AnaNikkie : public edm::one::EDAnalyzer<edm::one::SharedResources>  {
+class AnaNikkie : public edm::one::EDAnalyzer<edm::one::SharedResources> {
   public:
 
     explicit AnaNikkie ( const edm::ParameterSet& ) ;
@@ -83,44 +71,28 @@ class AnaNikkie : public edm::one::EDAnalyzer<edm::one::SharedResources>  {
     virtual void endJob ( ) override ;
 
     // ----------member data ---------------------------
+    edm::EDGetTokenT< TrackCollection >                        tracksToken_ ;
+    edm::EDGetTokenT< edm::DetSetVector< PixelDigi > >         pixeldigiToken_ ;
+    edm::EDGetTokenT< edmNew::DetSetVector< SiPixelCluster > > pixelclusterToken_ ;
+    edm::EDGetTokenT< edmNew::DetSetVector< SiPixelRecHit > >  pixelhitToken_ ;      
 
-    edm::EDGetTokenT<TrackCollection> tracksToken_ ;  //used to select what tracks to read from configuration file
-      
     edm::Service<TFileService> fs ;
      
-    //std::vector<TH1F *> DQM_ClusterCharge;
-    std::map< uint32_t, TH1F * > DQM_ClusterCharge;
-    std::vector<TH1F *> DQM_ClusterSize_X   ;  
-    std::vector<TH1F *> DQM_ClusterSize_Y   ; 
-    std::vector<TH1F *> DQM_ClusterSize_XY ;
-    std::vector<TH1F *> DQM_NumbOfCluster;
-    //std::vector<TH2F *> DQM_ClusterPosition ;
-    std::map< uint32_t, TH2F * > DQM_ClusterPosition ;
-      
-    std::vector<TH2F *> DQM_DigiPosition ;
-    std::vector<TH1F *> DQM_NumbOfDigi ;
-
-    TH1F * DQM_NumbOfCluster_Tot ;
-    TH1F * DQM_ClusterCharge_Tot ;
-      
-    TH1F * DQM_NumbOfDigi_Tot ;
-      
-    edm::EDGetTokenT<edm::DetSetVector<PixelDigi> >         pixeldigiToken_ ;
-    edm::EDGetTokenT<edmNew::DetSetVector<SiPixelCluster> > pixelclusterToken_ ;
-    edm::EDGetTokenT<edmNew::DetSetVector<SiPixelRecHit> >  pixelhitToken_ ;
-      
-    std::vector<uint32_t > list_of_modules ;
-    std::map<int, int> modulesNbr_to_idx ;
-    std::map<int , TString> detId_to_moduleName ;
-    std::vector<TString> names_of_modules ;
+    std::map< uint32_t, TH1F* > DQM_ClusterCharge ;
+    std::map< uint32_t, TH1F* > DQM_ClusterSize_X ;    
+    std::map< uint32_t, TH1F* > DQM_ClusterSize_Y ;    
+    std::map< uint32_t, TH1F* > DQM_ClusterSize_XY ;
+    std::map< uint32_t, TH1F* > DQM_NumbOfClusters_per_Event;
+    std::map< uint32_t, TH2F* > DQM_ClusterPosition ;
+    std::map< uint32_t, TH2F* > DQM_Hits_per_Pixel_per_Event ;
 
     // Correlation plots for the telescope
     std::map< std::pair<uint32_t, uint32_t>, TH2F*> DQM_Correlation_X ;
     std::map< std::pair<uint32_t, uint32_t>, TH2F*> DQM_Correlation_Y ;
 
+    // 3D Tree 
     TTree* cluster3DTree ;
 
-    // Declaration of leaves types
     Int_t      tree_runNumber ;
     Int_t      tree_lumiSection ;
     Int_t      tree_event ;
@@ -129,56 +101,21 @@ class AnaNikkie : public edm::one::EDAnalyzer<edm::one::SharedResources>  {
     Double_t   tree_x ;
     Double_t   tree_y ;
     Double_t   tree_z ;
-    TString    tree_modName;
+    TString    tree_modName ;
+    Long64_t   tree_maxEntries = 10000 ;
 
-};
+    // detId versus moduleName
+    std::map<int , TString> detId_to_moduleName ;
+
+} ;
 
 /////////////////////
 // Class functions //
 /////////////////////
 
-AnaNikkie::AnaNikkie(const edm::ParameterSet& iConfig)
- :
-  tracksToken_(consumes<TrackCollection>(iConfig.getUntrackedParameter<edm::InputTag>("tracks")))
+AnaNikkie::AnaNikkie( const edm::ParameterSet& iConfig ) : tracksToken_( consumes<TrackCollection>( iConfig.getUntrackedParameter<edm::InputTag>( "tracks" ) ) ) {
 
-{
- //now do what ever initialization is needed
-
-  list_of_modules.push_back(344200196) ;
-  list_of_modules.push_back(344201220) ; 
-  list_of_modules.push_back(344462340) ;
-  list_of_modules.push_back(344463364) ; 
-  list_of_modules.push_back(344724484) ;
-  list_of_modules.push_back(344725508) ; 
-  list_of_modules.push_back(344986628) ;
-  list_of_modules.push_back(344987652) ; 
-  list_of_modules.push_back(352588804) ;
-  list_of_modules.push_back(352589828) ;
-  list_of_modules.push_back(352850948) ; 
-  list_of_modules.push_back(352851972) ;
-  list_of_modules.push_back(353113092) ; 
-  list_of_modules.push_back(353114116) ; 
-  list_of_modules.push_back(353375236) ; 
-  list_of_modules.push_back(353376260) ; 
-
-  names_of_modules.push_back("M3090") ;
-  names_of_modules.push_back("M3124") ;
-  names_of_modules.push_back("M3082") ;
-  names_of_modules.push_back("M3175") ;
-  names_of_modules.push_back("M3009") ;
-  names_of_modules.push_back("M3057") ;
-  names_of_modules.push_back("M3027") ;
-  names_of_modules.push_back("M3074") ;
-  names_of_modules.push_back("M3192") ;
-  names_of_modules.push_back("M3204") ;
-  names_of_modules.push_back("M3226") ;
-  names_of_modules.push_back("M3265") ;
-  names_of_modules.push_back("M3023") ;
-  names_of_modules.push_back("M3239") ;
-  names_of_modules.push_back("M3164") ;
-  names_of_modules.push_back("M3173") ;
-
-  // This does not work yet, but I would like to have a map for the detId vs Module name:
+  // detId vs Module name
   detId_to_moduleName.insert( std::pair<uint32_t, TString>(344200196, "M3090") ) ;
   detId_to_moduleName.insert( std::pair<uint32_t, TString>(344201220, "M3124") ) ;
   detId_to_moduleName.insert( std::pair<uint32_t, TString>(344462340, "M3082") ) ;
@@ -196,25 +133,23 @@ AnaNikkie::AnaNikkie(const edm::ParameterSet& iConfig)
   detId_to_moduleName.insert( std::pair<uint32_t, TString>(353375236, "M3164") ) ;
   detId_to_moduleName.insert( std::pair<uint32_t, TString>(353376260, "M3173") ) ;
 
-  TFileDirectory sub1 = fs->mkdir(  "run100000" ); // This does not make sense yet
-
-  cluster3DTree = sub1.make<TTree>("cluster3DTree", "3D Cluster Tree");
-  TFileDirectory sub2 = sub1.mkdir( "dqmPlots" ) ;
-  TFileDirectory sub3 = sub2.mkdir( "runSummary" ) ;
-  TFileDirectory sub4 = sub1.mkdir( "correlationPlots" ) ;  
+  TFileDirectory sub1 = fs -> mkdir ( "clusterTree3D" ) ; 
+  
+  cluster3DTree = sub1.make<TTree> ("clusterTree3D", "3D Cluster Tree") ;
+  TFileDirectory sub2 = fs -> mkdir ( "dqmPlots" ) ;
+  TFileDirectory sub3 = fs -> mkdir ( "correlationPlots" ) ;  
 
   // Set branch addresses.
-  cluster3DTree->Branch("runNumber",&tree_runNumber);
-  cluster3DTree->Branch("lumiSection",&tree_lumiSection);
-  cluster3DTree->Branch("event",&tree_event);
-  cluster3DTree->Branch("detId",&tree_detId);
-  cluster3DTree->Branch("modName",&tree_modName);
-  cluster3DTree->Branch("cluster",&tree_cluster);
-  cluster3DTree->Branch("x",&tree_x);
-  cluster3DTree->Branch("y",&tree_y);
-  cluster3DTree->Branch("z",&tree_z);
-
-  //for(unsigned int i=0; i<list_of_modules.size(); i++) modulesNbr_to_idx[list_of_modules[i]] = i;
+  cluster3DTree -> Branch ( "runNumber", &tree_runNumber ) ;
+  cluster3DTree -> Branch ( "lumiSection", &tree_lumiSection ) ;
+  cluster3DTree -> Branch ( "event", &tree_event ) ;
+  cluster3DTree -> Branch ( "detId", &tree_detId ) ;
+  cluster3DTree -> Branch ( "modName", &tree_modName ) ;
+  cluster3DTree -> Branch ( "cluster", &tree_cluster ) ;
+  cluster3DTree -> Branch ( "x", &tree_x ) ;
+  cluster3DTree -> Branch ( "y", &tree_y ) ;
+  cluster3DTree -> Branch ( "z", &tree_z ) ;
+  cluster3DTree -> SetCircular ( tree_maxEntries ) ;
 
   for ( std::map<int, TString>::iterator it = detId_to_moduleName.begin(); it != detId_to_moduleName.end(); it++ ) {
     
@@ -228,8 +163,8 @@ AnaNikkie::AnaNikkie(const edm::ParameterSet& iConfig)
    
       TString modulename0 = jt -> second ;
 
-      TH2F* DQM_Correlation_X_tmp = sub4.make<TH2F>( ( "DQM_Correlation_X_" + modulename + "_" + modulename0).Data(), ( "X-Correlation between " + modulename + " and " + modulename0 ).Data(), 160., 0., 160., 160., 0., 160. ) ;
-      TH2F* DQM_Correlation_Y_tmp = sub4.make<TH2F>( ( "DQM_Correlation_Y_" + modulename + "_" + modulename0).Data(), ( "Y-Correlation between " + modulename + " and " + modulename0 ).Data(), 416., 0., 416., 416., 0., 416. ) ;
+      TH2F* DQM_Correlation_X_tmp = sub3.make<TH2F>( ( "DQM_Correlation_X_" + modulename + "_" + modulename0).Data(), ( "X-Correlation between " + modulename + " and " + modulename0 ).Data(), 160., 0., 160., 160., 0., 160. ) ;
+      TH2F* DQM_Correlation_Y_tmp = sub3.make<TH2F>( ( "DQM_Correlation_Y_" + modulename + "_" + modulename0).Data(), ( "Y-Correlation between " + modulename + " and " + modulename0 ).Data(), 416., 0., 416., 416., 0., 416. ) ;
 
       DQM_Correlation_X_tmp->GetXaxis()->SetTitle("x_" + modulename) ;
       DQM_Correlation_X_tmp->GetYaxis()->SetTitle("x_" + modulename0) ;
@@ -244,42 +179,33 @@ AnaNikkie::AnaNikkie(const edm::ParameterSet& iConfig)
     }//end for j 
 
     // Make the DQM plots
-    TH1F* DQM_ClusterCharge_tmp = sub3.make<TH1F>( ("DQM_ClusterCharge_"+ modulename).Data(), ("Cluster charge for "+ modulename).Data(), 100, 0., 100000. );
-    TH1F* DQM_ClusterSize_X_tmp = sub3.make<TH1F>( ("DQM_ClusterSize_X_"+ modulename).Data(), ("X cluster size for "+ modulename).Data(), 30, 0., 30. );
-    TH1F* DQM_ClusterSize_Y_tmp = sub3.make<TH1F>( ("DQM_ClusterSize_Y_"+ modulename).Data(), ("Y cluster size for "+ modulename).Data(), 30, 0., 30. );
-    TH1F* DQM_ClusterSize_XY_tmp = sub3.make<TH1F>( ("DQM_ClusterSize_XY_"+ modulename).Data(), ("Cluster Size for "  + modulename).Data(), 30, 0., 30. );
-    TH1F* DQM_NumbOfCluster_tmp = sub3.make<TH1F>( ("DQM_NumbOfCluster_"+ modulename).Data(), ("number of cluster for "  + modulename).Data(), 30, 0., 30. );
-    TH2F* DQM_ClusterPosition_tmp = sub3.make<TH2F>( ("DQM_ClusterPosition_"+ modulename).Data(), ("Cluster occupancy per col per row for "+ modulename).Data(), 416, 0., 416., 160, 0, 160 );
-      
-    DQM_ClusterCharge_tmp->GetXaxis()->SetTitle("Charge (electrons)");
-    DQM_ClusterSize_X_tmp->GetXaxis()->SetTitle("size (pixels)");
-    DQM_ClusterSize_Y_tmp->GetXaxis()->SetTitle("size (pixels)");	
-    DQM_ClusterSize_XY_tmp->GetXaxis()->SetTitle("size (pixels)"); 
-    DQM_ClusterPosition_tmp->GetXaxis()->SetTitle("col"); 
-    DQM_ClusterPosition_tmp->GetYaxis()->SetTitle("row"); 
-      
-    //DQM_ClusterCharge.push_back(DQM_ClusterCharge_tmp);  
-    DQM_ClusterCharge.insert( std::pair< uint32_t, TH1F* >( it->first, DQM_ClusterCharge_tmp ) ) ;  
-    DQM_ClusterSize_X.push_back(DQM_ClusterSize_X_tmp);   
-    DQM_ClusterSize_Y.push_back(DQM_ClusterSize_Y_tmp);    
-    DQM_ClusterSize_XY.push_back(DQM_ClusterSize_XY_tmp); 
-    DQM_NumbOfCluster.push_back(DQM_NumbOfCluster_tmp);
-    //DQM_ClusterPosition.push_back(DQM_ClusterPosition_tmp);      
-    DQM_ClusterPosition.insert( std::pair< uint32_t, TH2F* >( it->first, DQM_ClusterPosition_tmp ) ) ;      
-      
-    TH2F* DQM_DigiPosition_tmp = sub3.make<TH2F>( ("DQM_DigiPosition_"+ modulename).Data(), ("Digi occupancy per col per row for "+ modulename).Data(),  416,  0., 416., 160, 0, 160	);
-    TH1F* DQM_NumbOfDigi_tmp = sub3.make<TH1F>( ("DQM_NumbOfDigi"+ modulename).Data(),    ("Number of cluster for "  + modulename).Data(), 30,  0., 30. );
- 
-    DQM_DigiPosition.push_back(DQM_DigiPosition_tmp); 
-    DQM_NumbOfDigi.push_back(DQM_NumbOfDigi_tmp);
+    TH1F* DQM_ClusterCharge_tmp = sub2.make<TH1F>( ( "DQM_ClusterCharge_" + modulename ).Data(), ( "Cluster charge for " + modulename).Data(), 100, 0., 100000. );
+    TH1F* DQM_ClusterSize_X_tmp = sub2.make<TH1F>( ( "DQM_ClusterSize_X_" + modulename ).Data(), ( "X cluster size for " + modulename).Data(), 30, 0., 30. );
+    TH1F* DQM_ClusterSize_Y_tmp = sub2.make<TH1F>( ( "DQM_ClusterSize_Y_" + modulename ).Data(), ( "Y cluster size for " + modulename ).Data(), 30, 0., 30. ) ;
+    TH1F* DQM_ClusterSize_XY_tmp = sub2.make<TH1F>( ( "DQM_ClusterSize_XY_" + modulename ).Data(), ( "Cluster Size for "  + modulename ).Data(), 30, 0., 30. ) ;
+    TH1F* DQM_NumbOfClusters_per_Event_tmp = sub2.make<TH1F>( ("DQM_NumbOfClusters_per_Event_" + modulename).Data(), ("number of clusters for "  + modulename).Data(), 30, 0., 30. );
+    TH2F* DQM_ClusterPosition_tmp = sub2.make<TH2F>( ( "DQM_ClusterPosition_" + modulename ).Data(), ( "Cluster occupancy per col per row for " + modulename ).Data(), 416, 0., 416., 160, 0., 160. ) ;
+    TH2F* DQM_Hits_per_Pixel_per_Event_tmp = sub2.make<TH2F>( ( "DQM_HitsPerEventPerPixel_" + modulename ).Data(), ("Hits per event per pixel for " + modulename ).Data(), 4160, 0., 4160., 100000, 0., 2. ) ;  
+    DQM_ClusterCharge_tmp -> GetXaxis ( ) ->SetTitle ( "Charge (electrons)" ) ;
+    DQM_ClusterSize_X_tmp -> GetXaxis ( ) ->SetTitle ( "size (pixels)" ) ;
+    DQM_ClusterSize_Y_tmp -> GetXaxis ( ) ->SetTitle ( "size (pixels)" ) ;	
+    DQM_ClusterSize_XY_tmp -> GetXaxis ( ) ->SetTitle ( "size (pixels)" ) ; 
+    DQM_ClusterPosition_tmp -> GetXaxis ( ) ->SetTitle ( "col" ) ; 
+    DQM_ClusterPosition_tmp -> GetYaxis ( ) ->SetTitle ( "row" ) ; 
+    DQM_NumbOfClusters_per_Event_tmp -> GetXaxis ( ) -> SetTitle ( "Number of clusters / event " ) ;
+    DQM_NumbOfClusters_per_Event_tmp -> GetYaxis ( ) -> SetTitle ( "Count" ) ;
+    DQM_Hits_per_Pixel_per_Event_tmp -> GetXaxis ( ) -> SetTitle ( "Pixel" ) ;
+    DQM_Hits_per_Pixel_per_Event_tmp -> GetYaxis ( ) -> SetTitle ( "Number of hits / event" ) ;
 
-    DQM_DigiPosition_tmp->GetXaxis()->SetTitle("col"); 
-    DQM_DigiPosition_tmp->GetYaxis()->SetTitle("row"); 
+    DQM_ClusterCharge.insert ( std::pair< uint32_t, TH1F* >( it->first, DQM_ClusterCharge_tmp ) ) ;  
+    DQM_ClusterSize_X.insert ( std::pair< uint32_t, TH1F* >( it->first, DQM_ClusterSize_X_tmp ) ) ;
+    DQM_ClusterSize_Y.insert ( std::pair< uint32_t, TH1F* >( it->first, DQM_ClusterSize_Y_tmp ) ) ;
+    DQM_ClusterSize_XY.insert ( std::pair< uint32_t, TH1F* >( it->first, DQM_ClusterSize_XY_tmp ) ) ;
+    DQM_NumbOfClusters_per_Event.insert ( std::pair< uint32_t, TH1F* >( it->first, DQM_NumbOfClusters_per_Event_tmp ) );
+    DQM_ClusterPosition.insert ( std::pair< uint32_t, TH2F* >( it->first, DQM_ClusterPosition_tmp ) ) ;      
+    DQM_Hits_per_Pixel_per_Event.insert ( std::pair< uint32_t, TH2F* >( it->first, DQM_Hits_per_Pixel_per_Event_tmp ) ) ;
 
   }//end for it
-    
-  DQM_NumbOfDigi_Tot    = sub3.make<TH1F>( "DQM_NumbOfDigi_Tot",    "total number of digi"   , 30,  0., 30.);
-  DQM_NumbOfCluster_Tot = sub3.make<TH1F>( "DQM_NumbOfCluster_Tot", "total number of cluster", 30,  0., 30.);
   
   pixeldigiToken_    = consumes<edm::DetSetVector<PixelDigi> >        (iConfig.getParameter<edm::InputTag>("PixelDigisLabel"))   ;
   pixelclusterToken_ = consumes<edmNew::DetSetVector<SiPixelCluster> >(iConfig.getParameter<edm::InputTag>("PixelClustersLabel"));
@@ -300,9 +226,8 @@ AnaNikkie::~AnaNikkie()
 //
 
 // ------------ method called for each event  ------------
-void
-AnaNikkie::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
-{
+void AnaNikkie::analyze( const edm::Event& iEvent, const edm::EventSetup& iSetup ) {
+
   using namespace edm;
    
   EventID myEvId = iEvent.id();
@@ -341,51 +266,37 @@ AnaNikkie::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
   //---------------------------------
   //loop on digis
   //---------------------------------
-  
-  //define iterations (in a map) to count the number of cluster per module in the event
-  std::map<int, int> numberofDigi_per_module;  
-  int numberofDigi_total = 0;
-  for ( std::map<int, TString>::iterator it = detId_to_moduleName.begin(); it != detId_to_moduleName.end(); it++ ) numberofDigi_per_module[ it->first ] = 0 ;
-  //for(unsigned int i=0; i<list_of_modules.size(); i++) numberofDigi_per_module[ list_of_modules[i]  ] = 0;
-  
-  for( edm::DetSetVector<PixelDigi>::const_iterator DSViter=pixeldigis->begin(); DSViter!=pixeldigis->end(); DSViter++   ) {
-      
+
+  /*for( edm::DetSetVector<PixelDigi>::const_iterator DSViter=pixeldigis->begin(); DSViter!=pixeldigis->end(); DSViter++   ) { 
+    
     edm::DetSet<PixelDigi>::const_iterator begin=DSViter->begin();
     edm::DetSet<PixelDigi>::const_iterator end  =DSViter->end();
-      
+    
     auto id = DetId(DSViter->detId());
-      
+    
+    std::map< int, int > numHits_per_Channel ;
+    
     for(edm::DetSet<PixelDigi>::const_iterator iter=begin;iter!=end;++iter) {
-         
-	
-      float x = iter->column(); // barycenter x position
-      float y = iter->row();    // barycenter y position
+  
+      // First get the channel number of the hits
+      int channel = iter -> channel ( ) ;
       
-		DQM_DigiPosition[ modulesNbr_to_idx[int(id.rawId())]]->Fill(x, y);  
-		//DQM_DigiPosition[ detId_to_moduleName[ id.rawId() ] ] -> Fill ( x, y ) ;
-      
-		numberofDigi_per_module[ modulesNbr_to_idx[int(id.rawId())]]++;
-      //numberofDigi_per_module[ detId_to_moduleName[ id.rawId() ] ]++ ;
+      // Add one to the number of hits of the right channel
+      if ( numHits_per_Channel.count ( channel ) > 0 ) {
+        numHits_per_Channel[ channel ] ++ ;
+      } else {
+        numHits_per_Channel.insert ( std::pair< int, int >( channel, 1 ) ) ;
+      }//end if channel
 
-      numberofDigi_total++;
+    }//end for Digis   
 
-    }//end for DetSet
-  }//end for DetSetVector
+    for ( std::map< int, int >::iterator it = numHits_per_Channel.begin(); it != numHits_per_Channel.end(); it++  )  DQM_Hits_per_Pixel_per_Event[ id.rawId ( ) ] -> Fill ( it -> first, it -> second ) ;
 
-  DQM_NumbOfDigi_Tot->Fill(numberofDigi_total);
-  
-  //fill the number of cluster in the event per module
-  for(unsigned int i=0; i<list_of_modules.size(); i++) DQM_NumbOfDigi[i]->Fill( numberofDigi_per_module[i]) ;
-  
+  }//end for Detectors
+*/
   //---------------------------------
-  //loop on clusters
+  // Loop over the clusters
   //---------------------------------
-  unsigned int numberOfClusters = 0;
-  
-  //define iterations (in a map) to count the number of cluster per module in the event
-  std::map<int, int> numberofCluster_per_module; 
-  int numberofCulster_total = 0; 
-  for(unsigned int i=0; i<list_of_modules.size(); i++) numberofCluster_per_module[ list_of_modules[i] ] = 0;
 
   for( edmNew::DetSetVector<SiPixelCluster>::const_iterator DSViter=pixelclusters->begin(); DSViter!=pixelclusters->end();DSViter++   ) {
 
@@ -429,17 +340,17 @@ AnaNikkie::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
     }//end for first detectors2
   }//end for first detectors
 
-  for( edmNew::DetSetVector<SiPixelCluster>::const_iterator DSViter=pixelclusters->begin(); DSViter!=pixelclusters->end();DSViter++   ) 
-  {
-    numberOfClusters++;
+  for ( edmNew::DetSetVector< SiPixelCluster >::const_iterator DSViter=pixelclusters->begin(); DSViter!=pixelclusters->end(); DSViter++ ) {
 
     edmNew::DetSet<SiPixelCluster>::const_iterator begin=DSViter->begin();
     edmNew::DetSet<SiPixelCluster>::const_iterator end  =DSViter->end();
       
     auto id = DetId(DSViter->detId());
 
-    //int iCluster = 0;
-    for(edmNew::DetSet<SiPixelCluster>::const_iterator iter=begin;iter!=end;++iter) {
+    // Counting the number of clusters for this detector and this event
+    float numberOfClustersForThisModule = 0 ;
+
+    for ( edmNew::DetSet< SiPixelCluster >::const_iterator iter=begin; iter!=end; ++iter ) {
 	
       float x = iter->x();                   // barycenter x position
       float y = iter->y();                   // barycenter y position
@@ -449,20 +360,42 @@ AnaNikkie::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	
       int row = x-0.5, col = y -0.5;
       DQM_ClusterCharge[ id.rawId() ] -> Fill ( iter->charge() ) ;
-      DQM_ClusterSize_X[ modulesNbr_to_idx[id.rawId()]]->Fill(sizeX);   
-      DQM_ClusterSize_Y[ modulesNbr_to_idx[id.rawId()]]->Fill(sizeY);     
-      DQM_ClusterSize_XY[ modulesNbr_to_idx[id.rawId()]]->Fill(size);   
+      DQM_ClusterSize_X[ id.rawId() ] -> Fill ( sizeX ) ;   
+      DQM_ClusterSize_Y[ id.rawId() ] -> Fill ( sizeY ) ;     
+      DQM_ClusterSize_XY[ id.rawId() ] -> Fill ( size ) ;   
       DQM_ClusterPosition[ id.rawId() ] -> Fill ( col, row ) ;  
 	
-      numberofCluster_per_module[ modulesNbr_to_idx[id.rawId()]]++;
-	
-      numberofCulster_total++;
+      numberOfClustersForThisModule++ ;
 
     }//end for clusters in detector
+
+    // So now we fille the number of clusters per module
+    DQM_NumbOfClusters_per_Event[ id.rawId() ] -> Fill ( numberOfClustersForThisModule ) ;
+    
   }//end for detectors
 
-  // Now we fill the 3D cluster tree
-  for( edmNew::DetSetVector<SiPixelCluster>::const_iterator DSViter=pixelclusters->begin(); DSViter!=pixelclusters->end();DSViter++   ) {
+  //---------------------------------
+  // Loop over the hits
+  //---------------------------------
+
+/*  for ( edmNew::DetSetVector< SiPixelRecHit >::const_iterator DSViter=pixelhits->begin(); DSViter!=pixelhits->end(); DSViter++ ) {
+      
+    edmNew::DetSet<SiPixelRecHit>::const_iterator begin=DSViter->begin();
+    edmNew::DetSet<SiPixelRecHit>::const_iterator end  =DSViter->end();
+    
+    for ( edmNew::DetSet< SiPixelRecHit >::const_iterator iter=begin; iter!=end; ++iter ) {
+
+      // Here we do something with the hits.
+         
+    }//end for DetSet
+  }//end for DetSetVector
+*/
+
+  //---------------------------------
+  // Fill the 3D tree
+  //---------------------------------
+
+  for ( edmNew::DetSetVector<SiPixelCluster>::const_iterator DSViter=pixelclusters->begin(); DSViter!=pixelclusters->end();DSViter++ ) {
 
     edmNew::DetSet<SiPixelCluster>::const_iterator begin=DSViter->begin();
     edmNew::DetSet<SiPixelCluster>::const_iterator end  =DSViter->end();
@@ -474,7 +407,8 @@ AnaNikkie::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
     LocalPoint lp(-9999., -9999., -9999.);
 
     // Then loop on the clusters of the module
-    for(edmNew::DetSet<SiPixelCluster>::const_iterator itCluster=begin;itCluster!=end;++itCluster) {
+    for ( edmNew::DetSet<SiPixelCluster>::const_iterator itCluster=begin; itCluster!=end; ++itCluster ) {
+
       PixelClusterParameterEstimator::ReturnType params = cpe.getParameters(*itCluster,*pixdet);
       lp = std::get<0>(params);
 
@@ -498,48 +432,22 @@ AnaNikkie::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
       tree_modName = detId_to_moduleName[detId];
       cluster3DTree->Fill();
 
-      } //end for clusters of the first detector
-    } //end for first detectors
-      
-  DQM_NumbOfCluster_Tot->Fill(numberofCulster_total);
-  if(numberofCulster_total != 0 ) std::cout << "number of cluster " << numberOfClusters << std::endl;
-  
-  //fill the number of cluster in the event per module
-  for(unsigned int i=0; i<list_of_modules.size(); i++) DQM_NumbOfCluster[i]->Fill( numberofCluster_per_module[i]) ;
-  
-  //---------------------------------
-  //loop on hits
-  //---------------------------------
-  
-  for( edmNew::DetSetVector<SiPixelRecHit>::const_iterator DSViter=pixelhits->begin(); DSViter!=pixelhits->end(); DSViter++   ) {
-      
-    edmNew::DetSet<SiPixelRecHit>::const_iterator begin=DSViter->begin();
-    edmNew::DetSet<SiPixelRecHit>::const_iterator end  =DSViter->end();
-    
-    for(edmNew::DetSet<SiPixelRecHit>::const_iterator iter=begin;iter!=end;++iter) {
+    } //end for clusters of the first detector
+  } //end for first detectors
 
-      // Here we do something with the hits.
-         
-    }//end for DetSet
-  }//end for DetSetVector
 }//end analyze()
 
-
 // ------------ method called once each job just before starting event loop  ------------
-void
-AnaNikkie::beginJob()
-{
-}
+void AnaNikkie::beginJob ( ) {
+}//end void beginJob ( ) 
 
 // ------------ method called once each job just after ending the event loop  ------------
-void
-AnaNikkie::endJob()
-{
-}
+void AnaNikkie::endJob ( ) {
+}//end void endJobd ( ) 
 
 // ------------ method fills 'descriptions' with the allowed parameters for the module  ------------
-void
-AnaNikkie::fillDescriptions(edm::ConfigurationDescriptions& descriptions) {
+void AnaNikkie::fillDescriptions ( edm::ConfigurationDescriptions& descriptions ) {
+
   //The following says we do not know what parameters are allowed so do no validation
   // Please change this to state exactly what you do use, even if it is no parameters
   edm::ParameterSetDescription desc;
@@ -551,7 +459,8 @@ AnaNikkie::fillDescriptions(edm::ConfigurationDescriptions& descriptions) {
   //ParameterSetDescription desc;
   //desc.addUntracked<edm::InputTag>("tracks","ctfWithMaterialTracks");
   //descriptions.addDefault(desc);
-}
+
+}//end void fillDescriptions ( )
 
 //define this as a plug-in
-DEFINE_FWK_MODULE(AnaNikkie);
+DEFINE_FWK_MODULE ( AnaNikkie ) ;
