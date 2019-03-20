@@ -13,8 +13,13 @@
 
 
     <!-- TELESCOPE ARMS, PLANES AND PHASE 1 PIXELS -->
-    <SpecPar name="ArmPar">
-      <PartSelector path="//telescope:Arm"/>
+    <SpecPar name="MinusZArmPar">
+      <PartSelector path="//telescope:MinusZArm"/>
+      <Parameter name="TkDDDStructure" value="PixelPhase1EndcapSubDet"/>
+    </SpecPar>
+
+    <SpecPar name="PlusZArmPar">
+      <PartSelector path="//telescope:PlusZArm"/>
       <Parameter name="TkDDDStructure" value="PixelPhase1EndcapSubDet"/>
     </SpecPar>
 

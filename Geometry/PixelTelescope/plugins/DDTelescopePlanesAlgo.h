@@ -3,9 +3,11 @@
 
 //////////////////////////////////////////////////////////////////////////////////////////
 // DDTelescopePlanesAlgo
-// Description:  Places pixel telescope planes inside a given telescope arm.
-// The planes can be tilted (rotation around CMS_X) then skewed (rotation around CMS_Y).
-// The planes are all centered in (CMS_X,CMS_Y) = (0,0) and shifted along CMS_Z by deltaZ.
+// Description:  Places telescope plane frame of reference inside telescope arm frame of reference.
+// This is the composition of: * a preparatory rotation (transition between Phase 1 module frame of reference and what we need),
+//                             * then a tilt (rotation around CMS_X), 
+//                             * then a skew (rotation around CMS_Y),
+//                             * then a translation.
 // Author: Gabrielle Hugo
 //////////////////////////////////////////////////////////////////////////////////////////
 
@@ -31,10 +33,12 @@ public:
 
 private:
 
-  int           n;              // Number of telescope planes.
-  double        tiltAngle;      // Rotation around CMS_X. Angle is counted in the counter-trigonometric sense. Angle = 0 on (XY) plane. Must be in [0° 90°].
-  double        skewAngle;      // Rotation around CMS_Y. Angle is counted in the trigonometric sense. Angle = 0 on (XY) plane. Must be in [0° 90°].
-  double        deltaZ;         // Distance in Z between the centers of 2 consecutive planes.
+  int           childIndex;              // Plane index within arm.
+  double        tiltAngle;               // Plane rotation around CMS_X. Angle is counted in the counter-trigonometric sense.
+                                         // Angle = 0 on (XY) plane. Must be in [0° 90°].
+  double        skewAngle;               // Plane rotation around CMS_Y. Angle is counted in the trigonometric sense. 
+                                         // Angle = 0 on (XY) plane. Must be in [0° 90°].  
+  std::vector<double> planeTranslation;  // Plane translation within arm.
 
   std::string   idNameSpace;    // Namespace of this and ALL sub-parts.
   std::string   childName;      // Child name (ie, telescope plane name).

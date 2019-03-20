@@ -1,11 +1,12 @@
 //////////////////////////////////////////////////////////////////////////////////////////
 // DDTelescopePlanesAlgo
-// Description:  Places pixel telescope planes inside a given telescope arm.
-// The planes can be tilted (rotation around CMS_X) then skewed (rotation around CMS_Y).
-// The planes are all centered in (CMS_X,CMS_Y) = (0,0) and shifted along CMS_Z by deltaZ.
+// Description:  Places telescope plane frame of reference inside telescope arm frame of reference.
+// This is the composition of: * a preparatory rotation (transition between Phase 1 module frame of reference and what we need),
+//                             * then a tilt (rotation around CMS_X), 
+//                             * then a skew (rotation around CMS_Y),
+//                             * then a translation.
 // Author: Gabrielle Hugo
 //////////////////////////////////////////////////////////////////////////////////////////
-
 
 #include <cmath>
 #include <algorithm>
@@ -21,7 +22,7 @@
 
 
 DDTelescopePlanesAlgo::DDTelescopePlanesAlgo() {
-  LogDebug("TrackerGeom") << "DDTelescopePlanesAlgo info: Creating an instance";
+  LogDebug("DDTelescopePlanesAlgo") << "DDTelescopePlanesAlgo info: Creating an instance";
 }
 
 
@@ -34,22 +35,30 @@ void DDTelescopePlanesAlgo::initialize(const DDNumericArguments & nArgs,
 				  const DDStringArguments & sArgs,
 				  const DDStringVectorArguments & ) {
 
-  n             = int(nArgs["N"]);
-  tiltAngle     = nArgs["tiltAngle"];
-  skewAngle     = nArgs["skewAngle"];
-  deltaZ        = nArgs["deltaZ"];
+  childIndex        = int(nArgs["ChildIndex"]);
+  tiltAngle         = nArgs["planeTiltAngle"];
+  skewAngle         = nArgs["planeSkewAngle"];
+  planeTranslation  = vArgs["planeTranslation"];
   
-  LogDebug("TrackerGeom") << "DDTelescopePlanesAlgo debug: Parameters for position"
-			  << "ing:: n " << n << " telescope planes with deltaZ "
-			  << deltaZ << ", tiltAngle "
-			  << tiltAngle/CLHEP::deg << ", skew angle " 
-			  << skewAngle/CLHEP::deg;
+  LogDebug("DDTelescopePlanesAlgo") << "DDTelescopePlanesAlgo debug: Parameters for positioning"
+			  << " telescope plane index = " << childIndex << " in arm."
+			  << " tiltAngle = " << tiltAngle/CLHEP::deg
+			  << ", skew angle = " << skewAngle/CLHEP::deg;
+  
+  if (planeTranslation.size() != 3) {
+    edm::LogError("DDTelescopePlanesAlgo") << " ERROR - Parameter planeTranslation should be of size 3.";
+  }
+  else {
+    LogDebug("DDTelescopePlanesAlgo") << ", translation in X = " << planeTranslation.at(0)
+				      << ", translation in Y = " << planeTranslation.at(1)
+				      << ", translation in Z = " << planeTranslation.at(2);
+  }
 
   idNameSpace = DDCurrentNamespace::ns();
   childName   = sArgs["ChildName"];
 
   DDName parentName = parent().name();
-  LogDebug("TrackerGeom") << "DDTelescopePlanesAlgo debug: Parent " << parentName
+  LogDebug("DDTelescopePlanesAlgo") << "DDTelescopePlanesAlgo debug: Parent " << parentName
 			  << "\tChild " << childName << " NameSpace "
 			  << idNameSpace;
 }
@@ -70,7 +79,7 @@ void DDTelescopePlanesAlgo::execute(DDCompactView& cpv) {
   std::string prepaRotstr = rotstr + "Prepa";
   prepaRot = DDRotation(DDName(prepaRotstr, idNameSpace));
   if (!prepaRot) {
-    LogDebug("TrackerGeom") << "DDTelescopePlanesAlgo test: Creating a new rotation: " << prepaRotstr
+    LogDebug("DDTelescopePlanesAlgo") << "DDTelescopePlanesAlgo test: Creating a new rotation: " << prepaRotstr
 			    << "\t90., 0., "
 			    << "180., 0., "
 			    << "90., 90.";
@@ -86,7 +95,7 @@ void DDTelescopePlanesAlgo::execute(DDCompactView& cpv) {
   std::string tiltRotstr = rotstr + "Tilt" + std::to_string(tiltAngle/CLHEP::deg);
   tiltRot = DDRotation(DDName(tiltRotstr, idNameSpace));
   if (!tiltRot) {
-    LogDebug("TrackerGeom") << "DDTelescopePlanesAlgo test: Creating a new rotation: " << tiltRotstr
+    LogDebug("DDTelescopePlanesAlgo") << "DDTelescopePlanesAlgo test: Creating a new rotation: " << tiltRotstr
 			    << "\t90., 0., "
 			    << 90. + tiltAngle/CLHEP::deg << ", 90., "
 			    << tiltAngle/CLHEP::deg << ", 90.";
@@ -106,7 +115,7 @@ void DDTelescopePlanesAlgo::execute(DDCompactView& cpv) {
   std::string skewRotstr = rotstr + "Skew" + std::to_string(skewAngle/CLHEP::deg);
   skewRot = DDRotation(DDName(skewRotstr, idNameSpace));
   if (!skewRot) {
-    LogDebug("TrackerGeom") << "DDTelescopePlanesAlgo test: Creating a new rotation: " << skewRotstr
+    LogDebug("DDTelescopePlanesAlgo") << "DDTelescopePlanesAlgo test: Creating a new rotation: " << skewRotstr
 			    << "\t" << 90. + skewAngle/CLHEP::deg << ", 0., "
 			    << "90., 90., "
 			    << skewAngle/CLHEP::deg << ", 0.";
@@ -123,32 +132,26 @@ void DDTelescopePlanesAlgo::execute(DDCompactView& cpv) {
   std::string globalRotstr = rotstr + "Global";
   globalRot = DDRotation(DDName(globalRotstr, idNameSpace));
   if (!globalRot) {
-    LogDebug("TrackerGeom") << "DDTelescopePlanesAlgo test: Creating a new "
+    LogDebug("DDTelescopePlanesAlgo") << "DDTelescopePlanesAlgo test: Creating a new "
 			    << "rotation: " << globalRotstr;
     globalRotMatrix = skewMatrix;   
     // Can finally create globalRot. globalRot = skewRot ◦ tiltRot ◦ prepaRot
     globalRot = DDrot(DDName(globalRotstr, idNameSpace), new DDRotationMatrix(globalRotMatrix)); 
   }
 
-  // Loops on all n telescope planes
+  // Places plane within telescope
   DDName mother = parent().name();  // telescope arm
-  DDName child(DDSplit(childName).first, DDSplit(childName).second);
-  int    copy   = 1;
+  DDName child(DDSplit(childName).first, DDSplit(childName).second);  // telescope plane
 
-  for (int i=0; i<n; i++) {
+  // translation def
+  double xpos = planeTranslation.at(0);
+  double ypos = planeTranslation.at(1);
+  double zpos = planeTranslation.at(2);
+  DDTranslation tran(xpos, ypos, zpos);
   
-    // translation def
-    double xpos = 0.;
-    double ypos = 0.;
-    double zpos = (-(n-1.)/2. + i) * deltaZ;
-    DDTranslation tran(xpos, ypos, zpos);
-  
-    // Positions child with respect to parent
-    cpv.position(child, mother, copy, tran, globalRot); // Rotate child with globalRot, then translate it with tran
-    LogDebug("TrackerGeom") << "DDTelescopePlanesAlgo test " << child << " number "
-			    << copy << " positioned in " << mother << " at "
-			    << tran  << " with " << globalRot;
-
-    copy += 1;
-  }
+  // Positions child with respect to parent
+  cpv.position(child, mother, childIndex, tran, globalRot); // Rotate child with globalRot, then translate it with tran
+  LogDebug("DDTelescopePlanesAlgo") << "DDTelescopePlanesAlgo test " << child << " number "
+			  << childIndex << " positioned in " << mother << " at "
+			  << tran  << " with " << globalRot;
 }

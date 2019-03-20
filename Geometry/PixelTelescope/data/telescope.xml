@@ -3,6 +3,7 @@
 <DDDefinition xmlns="http://www.cern.ch/cms/DDL" xmlns:xsi="http://www.cern.ch/www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.cern.ch/cms/DDL ../../../DetectorDescription/Schema/DDLSchema.xsd">
 
 
+
   <!-- CONSTANTS -->
   <!-- Should not need to change this. -->
   <!-- Renaming phase 1 modules constants for clarity. -->
@@ -39,7 +40,8 @@
     <Box name="DUTContainer" dx="260.0*mm" dy="180.0*mm" dz="73.0*mm"/>
     <Box name="DUTLayer" dx="260.0*mm" dy="180.0*mm" dz="73.0*mm"/>
     <Box name="DUTHolder" dx="260.0*mm" dy="160.0*mm" dz="20.0*mm"/>
-    <Box name="Arm" dx="100.0*mm" dy="70.0*mm" dz="150.0*mm"/>
+    <Box name="MinusZArm" dx="100.0*mm" dy="70.0*mm" dz="150.0*mm"/>
+    <Box name="PlusZArm" dx="100.0*mm" dy="70.0*mm" dz="150.0*mm"/>
     <Box name="Plane" dx="[Phase1BPIXModuleWidth]" dy="2.*[Phase1BPIXModuleThickness]" dz="[Phase1BPIXModuleLength]/2.0"/>
   </SolidSection>
 
@@ -71,8 +73,12 @@
       <rSolid name="telescope:DUTHolder"/>
       <rMaterial name="materials:Air"/>
     </LogicalPart>
-    <LogicalPart name="Arm" category="unspecified">
-      <rSolid name="telescope:Arm"/>
+    <LogicalPart name="MinusZArm" category="unspecified">
+      <rSolid name="telescope:MinusZArm"/>
+      <rMaterial name="materials:Air"/>
+    </LogicalPart>
+    <LogicalPart name="PlusZArm" category="unspecified">
+      <rSolid name="telescope:PlusZArm"/>
       <rMaterial name="materials:Air"/>
     </LogicalPart>
     <LogicalPart name="Plane" category="unspecified">
@@ -90,34 +96,109 @@
       <rChild name="telescope:BeamArea"/>
     </PosPart>
 
+
     <!-- PLACE TELESCOPE MOTHER VOLUME -->
     <PosPart copyNumber="1">
       <rParent name="telescope:BeamArea"/>
       <rChild name="telescope:Telescope"/>
-      <Translation x="500.0*mm" y="0.0*mm" z="0.0*mm"/>
+      <Translation x="[tuneParameters:TelescopeCenterX]" y="[tuneParameters:TelescopeCenterY]" z="[tuneParameters:TelescopeCenterZ]"/>
     </PosPart>
+
 
     <!-- PLACE ARMS WITHIN TELESCOPE -->
     <PosPart copyNumber="1">
       <rParent name="telescope:Telescope"/>
-      <rChild name="telescope:Arm"/>
-      <Translation x="0.0*mm" y="0.0*mm" z="[tuneParameters:InterArmDeltaZ]/2.0"/>
+      <rChild name="telescope:MinusZArm"/>
+      <Translation x="[tuneParameters:MinusZArmCenterX]" y="[tuneParameters:MinusZArmCenterY]" z="[tuneParameters:MinusZArmCenterZ]"/>
     </PosPart>
-    <PosPart copyNumber="2">
+    <PosPart copyNumber="1">
       <rParent name="telescope:Telescope"/>
-      <rChild name="telescope:Arm"/>
-      <Translation x="0.0*mm" y="0.0*mm" z="-[tuneParameters:InterArmDeltaZ]/2.0"/>
+      <rChild name="telescope:PlusZArm"/>
+      <Translation x="[tuneParameters:PlusZArmCenterX]" y="[tuneParameters:PlusZArmCenterY]" z="[tuneParameters:PlusZArmCenterZ]"/>
     </PosPart>
 
+
     <!-- PLACE PLANES WITHIN ARM -->
+    <!-- Plane 1 : the plane located at the lowest Z -->
     <Algorithm name="phase2TestBeam:DDTelescopePlanesAlgo">
-      <rParent name="telescope:Arm"/>
+      <rParent name="telescope:MinusZArm"/>
       <String name="ChildName" value="telescope:Plane"/>
-      <Numeric name="N" value="4"/>
-      <Numeric name="tiltAngle" value="[tuneParameters:PlaneTiltAngle]"/>
-      <Numeric name="skewAngle" value="[tuneParameters:PlaneSkewAngle]"/>
-      <Numeric name="deltaZ" value="[tuneParameters:InterPlaneDeltaZ]"/>
+      <Numeric name="ChildIndex" value="1"/>
+      <Numeric name="planeTiltAngle" value="[tuneParameters:Plane1TiltAngle]"/>
+      <Numeric name="planeSkewAngle" value="[tuneParameters:Plane1SkewAngle]"/>
+      <Vector name="planeTranslation" type="numeric" nEntries="3"> [tuneParameters:Plane1CenterX], [tuneParameters:Plane1CenterY], [tuneParameters:Plane1CenterZ]</Vector>    
     </Algorithm>
+
+    <!-- Plane 2 -->
+    <Algorithm name="phase2TestBeam:DDTelescopePlanesAlgo">
+      <rParent name="telescope:MinusZArm"/>
+      <String name="ChildName" value="telescope:Plane"/>
+      <Numeric name="ChildIndex" value="2"/>
+      <Numeric name="planeTiltAngle" value="[tuneParameters:Plane2TiltAngle]"/>
+      <Numeric name="planeSkewAngle" value="[tuneParameters:Plane2SkewAngle]"/>
+      <Vector name="planeTranslation" type="numeric" nEntries="3"> [tuneParameters:Plane2CenterX], [tuneParameters:Plane2CenterY], [tuneParameters:Plane2CenterZ]</Vector>    
+    </Algorithm>
+
+    <!-- Plane 3 -->
+    <Algorithm name="phase2TestBeam:DDTelescopePlanesAlgo">
+      <rParent name="telescope:MinusZArm"/>
+      <String name="ChildName" value="telescope:Plane"/>
+      <Numeric name="ChildIndex" value="3"/>
+      <Numeric name="planeTiltAngle" value="[tuneParameters:Plane3TiltAngle]"/>
+      <Numeric name="planeSkewAngle" value="[tuneParameters:Plane3SkewAngle]"/>
+      <Vector name="planeTranslation" type="numeric" nEntries="3"> [tuneParameters:Plane3CenterX], [tuneParameters:Plane3CenterY], [tuneParameters:Plane3CenterZ]</Vector>    
+    </Algorithm>
+
+    <!-- Plane 4 -->
+    <Algorithm name="phase2TestBeam:DDTelescopePlanesAlgo">
+      <rParent name="telescope:MinusZArm"/>
+      <String name="ChildName" value="telescope:Plane"/>
+      <Numeric name="ChildIndex" value="4"/>
+      <Numeric name="planeTiltAngle" value="[tuneParameters:Plane4TiltAngle]"/>
+      <Numeric name="planeSkewAngle" value="[tuneParameters:Plane4SkewAngle]"/>
+      <Vector name="planeTranslation" type="numeric" nEntries="3"> [tuneParameters:Plane4CenterX], [tuneParameters:Plane4CenterY], [tuneParameters:Plane4CenterZ]</Vector>    
+    </Algorithm>
+
+    <!-- Plane 5 -->
+    <Algorithm name="phase2TestBeam:DDTelescopePlanesAlgo">
+      <rParent name="telescope:PlusZArm"/>
+      <String name="ChildName" value="telescope:Plane"/>
+      <Numeric name="ChildIndex" value="1"/>
+      <Numeric name="planeTiltAngle" value="[tuneParameters:Plane5TiltAngle]"/>
+      <Numeric name="planeSkewAngle" value="[tuneParameters:Plane5SkewAngle]"/>
+      <Vector name="planeTranslation" type="numeric" nEntries="3"> [tuneParameters:Plane5CenterX], [tuneParameters:Plane5CenterY], [tuneParameters:Plane5CenterZ]</Vector>    
+    </Algorithm>
+
+    <!-- Plane 6 -->
+    <Algorithm name="phase2TestBeam:DDTelescopePlanesAlgo">
+      <rParent name="telescope:PlusZArm"/>
+      <String name="ChildName" value="telescope:Plane"/>
+      <Numeric name="ChildIndex" value="2"/>
+      <Numeric name="planeTiltAngle" value="[tuneParameters:Plane6TiltAngle]"/>
+      <Numeric name="planeSkewAngle" value="[tuneParameters:Plane6SkewAngle]"/>
+      <Vector name="planeTranslation" type="numeric" nEntries="3"> [tuneParameters:Plane6CenterX], [tuneParameters:Plane6CenterY], [tuneParameters:Plane6CenterZ]</Vector>    
+    </Algorithm>
+
+    <!-- Plane 7 -->
+    <Algorithm name="phase2TestBeam:DDTelescopePlanesAlgo">
+      <rParent name="telescope:PlusZArm"/>
+      <String name="ChildName" value="telescope:Plane"/>
+      <Numeric name="ChildIndex" value="3"/>
+      <Numeric name="planeTiltAngle" value="[tuneParameters:Plane7TiltAngle]"/>
+      <Numeric name="planeSkewAngle" value="[tuneParameters:Plane7SkewAngle]"/>
+      <Vector name="planeTranslation" type="numeric" nEntries="3"> [tuneParameters:Plane7CenterX], [tuneParameters:Plane7CenterY], [tuneParameters:Plane7CenterZ]</Vector>    
+    </Algorithm>
+
+    <!-- Plane 8 : the plane located at the biggest Z -->
+    <Algorithm name="phase2TestBeam:DDTelescopePlanesAlgo">
+      <rParent name="telescope:PlusZArm"/>
+      <String name="ChildName" value="telescope:Plane"/>
+      <Numeric name="ChildIndex" value="4"/>
+      <Numeric name="planeTiltAngle" value="[tuneParameters:Plane8TiltAngle]"/>
+      <Numeric name="planeSkewAngle" value="[tuneParameters:Plane8SkewAngle]"/>
+      <Vector name="planeTranslation" type="numeric" nEntries="3"> [tuneParameters:Plane8CenterX], [tuneParameters:Plane8CenterY], [tuneParameters:Plane8CenterZ]</Vector>    
+    </Algorithm>
+
 
     <!-- PLACE PHASE1 MODULES WITHIN PLANE --> 
     <PosPart copyNumber="1">
@@ -131,6 +212,7 @@
       <rRotation name="telescope:Z180"/>   
       <Translation x="[tuneParameters:MovePhase1ModuleInPlaneAlongModuleWidth]/2.0" y="-[tuneParameters:MovePhase1ModuleInPlaneAlongModuleThickness]/2.0" z="0.0*mm"/>
     </PosPart>
+
 
     <!-- PLACE DUT WITHIN TELESCOPE -->
     <PosPart copyNumber="1">

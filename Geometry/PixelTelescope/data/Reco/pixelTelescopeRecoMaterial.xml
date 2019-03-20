@@ -4,7 +4,8 @@
 
     <!-- PHASE 1 PIXEL SENSORS -->
     <SpecPar eval="true" name="TrackerRecMaterialPixelBarrelLayer3">
-      <PartSelector path="//telescope:Telescope/telescope:Arm/telescope:Plane/Phase1BPIXLayer4Module:PixelBarrelModuleFullPlus/Phase1BPIXLayer4Module:PixelBarrelSensorFull/Phase1BPIXLayer4Module:PixelBarrelActiveFull3" />
+      <PartSelector path="//telescope:Telescope/telescope:MinusZArm/telescope:Plane/Phase1BPIXLayer4Module:PixelBarrelModuleFullPlus/Phase1BPIXLayer4Module:PixelBarrelSensorFull/Phase1BPIXLayer4Module:PixelBarrelActiveFull3" />
+      <PartSelector path="//telescope:Telescope/telescope:PlusZArm/telescope:Plane/Phase1BPIXLayer4Module:PixelBarrelModuleFullPlus/Phase1BPIXLayer4Module:PixelBarrelSensorFull/Phase1BPIXLayer4Module:PixelBarrelActiveFull3" />
       <Parameter name="TrackerRadLength" value="0.0211882" />   <!-- TO DO : Are values correct? (present values from Phase 1 description) --> 
       <Parameter name="TrackerXi" value="4.4212e-05" />
     </SpecPar>
