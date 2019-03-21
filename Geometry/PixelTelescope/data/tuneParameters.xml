@@ -49,7 +49,7 @@
     <!-- NB on angles orientation: -->
     <!-- "PlaneTiltAngle" and "PlaneSkewAngle" must be in [0° 90°]. -->
     <!-- If one want to invert the trigonometric sense they are counted in (should not at all be needed!), -->
-    <!-- simply uncomment 2 lines in DDTelescopePlanesAlgo as precisely described in plugins/DDTelescopePlanesAlgo.cc -->
+    <!-- simply uncomment 2 lines in DDTelescopePlaneAlgo as precisely described in plugins/DDTelescopePlaneAlgo.cc -->
 
     <!-- Plane 1 : the plane located at the lowest Z -->
     <Constant name="Plane1TiltAngle" value="[tuneParameters:PlaneTiltAngle]"/>

@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////////////////
-// DDTelescopePlanesAlgo
+// DDTelescopePlaneAlgo
 // Description:  Places telescope plane frame of reference inside telescope arm frame of reference.
 // This is the composition of: * a preparatory rotation (transition between Phase 1 module frame of reference and what we need),
 //                             * then a tilt (rotation around CMS_X), 
@@ -14,22 +14,22 @@
 #include "FWCore/MessageLogger/interface/MessageLogger.h"
 #include "DetectorDescription/Core/interface/DDCurrentNamespace.h"
 #include "DetectorDescription/Core/interface/DDSplit.h"
-#include "Geometry/PixelTelescope/plugins/DDTelescopePlanesAlgo.h"
+#include "Geometry/PixelTelescope/plugins/DDTelescopePlaneAlgo.h"
 #include "DetectorDescription/Core/interface/DDRotationMatrix.h"
 #include "DetectorDescription/Core/interface/DDTransform.h"
 #include "CLHEP/Units/GlobalPhysicalConstants.h"
 #include "CLHEP/Units/GlobalSystemOfUnits.h"
 
 
-DDTelescopePlanesAlgo::DDTelescopePlanesAlgo() {
-  LogDebug("DDTelescopePlanesAlgo") << "DDTelescopePlanesAlgo info: Creating an instance";
+DDTelescopePlaneAlgo::DDTelescopePlaneAlgo() {
+  LogDebug("DDTelescopePlaneAlgo") << "DDTelescopePlaneAlgo info: Creating an instance";
 }
 
 
-DDTelescopePlanesAlgo::~DDTelescopePlanesAlgo() {}
+DDTelescopePlaneAlgo::~DDTelescopePlaneAlgo() {}
 
 
-void DDTelescopePlanesAlgo::initialize(const DDNumericArguments & nArgs,
+void DDTelescopePlaneAlgo::initialize(const DDNumericArguments & nArgs,
 				  const DDVectorArguments & vArgs,
 				  const DDMapArguments & ,
 				  const DDStringArguments & sArgs,
@@ -40,16 +40,16 @@ void DDTelescopePlanesAlgo::initialize(const DDNumericArguments & nArgs,
   skewAngle         = nArgs["planeSkewAngle"];
   planeTranslation  = vArgs["planeTranslation"];
   
-  LogDebug("DDTelescopePlanesAlgo") << "DDTelescopePlanesAlgo debug: Parameters for positioning"
+  LogDebug("DDTelescopePlaneAlgo") << "DDTelescopePlaneAlgo debug: Parameters for positioning"
 			  << " telescope plane index = " << childIndex << " in arm."
 			  << " tiltAngle = " << tiltAngle/CLHEP::deg
 			  << ", skew angle = " << skewAngle/CLHEP::deg;
   
   if (planeTranslation.size() != 3) {
-    edm::LogError("DDTelescopePlanesAlgo") << " ERROR - Parameter planeTranslation should be of size 3.";
+    edm::LogError("DDTelescopePlaneAlgo") << " ERROR - Parameter planeTranslation should be of size 3.";
   }
   else {
-    LogDebug("DDTelescopePlanesAlgo") << ", translation in X = " << planeTranslation.at(0)
+    LogDebug("DDTelescopePlaneAlgo") << ", translation in X = " << planeTranslation.at(0)
 				      << ", translation in Y = " << planeTranslation.at(1)
 				      << ", translation in Z = " << planeTranslation.at(2);
   }
@@ -58,17 +58,17 @@ void DDTelescopePlanesAlgo::initialize(const DDNumericArguments & nArgs,
   childName   = sArgs["ChildName"];
 
   DDName parentName = parent().name();
-  LogDebug("DDTelescopePlanesAlgo") << "DDTelescopePlanesAlgo debug: Parent " << parentName
+  LogDebug("DDTelescopePlaneAlgo") << "DDTelescopePlaneAlgo debug: Parent " << parentName
 			  << "\tChild " << childName << " NameSpace "
 			  << idNameSpace;
 }
 
 
-void DDTelescopePlanesAlgo::execute(DDCompactView& cpv) {
+void DDTelescopePlaneAlgo::execute(DDCompactView& cpv) {
 
   DDRotation prepaRot, tiltRot, skewRot, globalRot;                      // Default-constructed to identity in SO(3).
   DDRotationMatrix prepaMatrix, tiltMatrix, skewMatrix, globalRotMatrix; // Default-constructed to identity matrix.
-  std::string rotstr = "RTelescopePlanesAlgo";
+  std::string rotstr = "RTelescopePlaneAlgo";
 
   // prepaMatrix calculus
   // Rotation around CMS_X of 90°, in counter-trigonometric sense.
@@ -79,7 +79,7 @@ void DDTelescopePlanesAlgo::execute(DDCompactView& cpv) {
   std::string prepaRotstr = rotstr + "Prepa";
   prepaRot = DDRotation(DDName(prepaRotstr, idNameSpace));
   if (!prepaRot) {
-    LogDebug("DDTelescopePlanesAlgo") << "DDTelescopePlanesAlgo test: Creating a new rotation: " << prepaRotstr
+    LogDebug("DDTelescopePlaneAlgo") << "DDTelescopePlaneAlgo test: Creating a new rotation: " << prepaRotstr
 			    << "\t90., 0., "
 			    << "180., 0., "
 			    << "90., 90.";
@@ -95,7 +95,7 @@ void DDTelescopePlanesAlgo::execute(DDCompactView& cpv) {
   std::string tiltRotstr = rotstr + "Tilt" + std::to_string(tiltAngle/CLHEP::deg);
   tiltRot = DDRotation(DDName(tiltRotstr, idNameSpace));
   if (!tiltRot) {
-    LogDebug("DDTelescopePlanesAlgo") << "DDTelescopePlanesAlgo test: Creating a new rotation: " << tiltRotstr
+    LogDebug("DDTelescopePlaneAlgo") << "DDTelescopePlaneAlgo test: Creating a new rotation: " << tiltRotstr
 			    << "\t90., 0., "
 			    << 90. + tiltAngle/CLHEP::deg << ", 90., "
 			    << tiltAngle/CLHEP::deg << ", 90.";
@@ -115,7 +115,7 @@ void DDTelescopePlanesAlgo::execute(DDCompactView& cpv) {
   std::string skewRotstr = rotstr + "Skew" + std::to_string(skewAngle/CLHEP::deg);
   skewRot = DDRotation(DDName(skewRotstr, idNameSpace));
   if (!skewRot) {
-    LogDebug("DDTelescopePlanesAlgo") << "DDTelescopePlanesAlgo test: Creating a new rotation: " << skewRotstr
+    LogDebug("DDTelescopePlaneAlgo") << "DDTelescopePlaneAlgo test: Creating a new rotation: " << skewRotstr
 			    << "\t" << 90. + skewAngle/CLHEP::deg << ", 0., "
 			    << "90., 90., "
 			    << skewAngle/CLHEP::deg << ", 0.";
@@ -132,7 +132,7 @@ void DDTelescopePlanesAlgo::execute(DDCompactView& cpv) {
   std::string globalRotstr = rotstr + "Global";
   globalRot = DDRotation(DDName(globalRotstr, idNameSpace));
   if (!globalRot) {
-    LogDebug("DDTelescopePlanesAlgo") << "DDTelescopePlanesAlgo test: Creating a new "
+    LogDebug("DDTelescopePlaneAlgo") << "DDTelescopePlaneAlgo test: Creating a new "
 			    << "rotation: " << globalRotstr;
     globalRotMatrix = skewMatrix;   
     // Can finally create globalRot. globalRot = skewRot ◦ tiltRot ◦ prepaRot
@@ -144,14 +144,22 @@ void DDTelescopePlanesAlgo::execute(DDCompactView& cpv) {
   DDName child(DDSplit(childName).first, DDSplit(childName).second);  // telescope plane
 
   // translation def
-  double xpos = planeTranslation.at(0);
-  double ypos = planeTranslation.at(1);
-  double zpos = planeTranslation.at(2);
+  double xpos = 0;
+  double ypos = 0;
+  double zpos = 0;
+  if (planeTranslation.size() != 3) {
+    edm::LogError("DDTelescopePlaneAlgo") << " ERROR - Parameter planeTranslation should be of size 3.";
+  }
+  else {
+    xpos = planeTranslation.at(0);
+    ypos = planeTranslation.at(1);
+    zpos = planeTranslation.at(2);
+  }
   DDTranslation tran(xpos, ypos, zpos);
   
   // Positions child with respect to parent
   cpv.position(child, mother, childIndex, tran, globalRot); // Rotate child with globalRot, then translate it with tran
-  LogDebug("DDTelescopePlanesAlgo") << "DDTelescopePlanesAlgo test " << child << " number "
+  LogDebug("DDTelescopePlaneAlgo") << "DDTelescopePlaneAlgo test " << child << " number "
 			  << childIndex << " positioned in " << mother << " at "
 			  << tran  << " with " << globalRot;
 }

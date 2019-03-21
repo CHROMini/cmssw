@@ -1,8 +1,8 @@
-#ifndef DD_TelescopePlanesAlgo_h
-#define DD_TelescopePlanesAlgo_h
+#ifndef DD_TelescopePlaneAlgo_h
+#define DD_TelescopePlaneAlgo_h
 
 //////////////////////////////////////////////////////////////////////////////////////////
-// DDTelescopePlanesAlgo
+// DDTelescopePlaneAlgo
 // Description:  Places telescope plane frame of reference inside telescope arm frame of reference.
 // This is the composition of: * a preparatory rotation (transition between Phase 1 module frame of reference and what we need),
 //                             * then a tilt (rotation around CMS_X), 
@@ -17,11 +17,11 @@
 #include "DetectorDescription/Core/interface/DDTypes.h"
 #include "DetectorDescription/Core/interface/DDAlgorithm.h"
 
-class DDTelescopePlanesAlgo : public DDAlgorithm {
+class DDTelescopePlaneAlgo : public DDAlgorithm {
  
 public:
-  DDTelescopePlanesAlgo(); 
-  ~DDTelescopePlanesAlgo() override;
+  DDTelescopePlaneAlgo(); 
+  ~DDTelescopePlaneAlgo() override;
   
   void initialize(const DDNumericArguments & nArgs,
 		  const DDVectorArguments & vArgs,

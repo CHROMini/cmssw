@@ -120,7 +120,7 @@
 
     <!-- PLACE PLANES WITHIN ARM -->
     <!-- Plane 1 : the plane located at the lowest Z -->
-    <Algorithm name="phase2TestBeam:DDTelescopePlanesAlgo">
+    <Algorithm name="phase2TestBeam:DDTelescopePlaneAlgo">
       <rParent name="telescope:MinusZArm"/>
       <String name="ChildName" value="telescope:Plane"/>
       <Numeric name="ChildIndex" value="1"/>
@@ -130,7 +130,7 @@
     </Algorithm>
 
     <!-- Plane 2 -->
-    <Algorithm name="phase2TestBeam:DDTelescopePlanesAlgo">
+    <Algorithm name="phase2TestBeam:DDTelescopePlaneAlgo">
       <rParent name="telescope:MinusZArm"/>
       <String name="ChildName" value="telescope:Plane"/>
       <Numeric name="ChildIndex" value="2"/>
@@ -140,7 +140,7 @@
     </Algorithm>
 
     <!-- Plane 3 -->
-    <Algorithm name="phase2TestBeam:DDTelescopePlanesAlgo">
+    <Algorithm name="phase2TestBeam:DDTelescopePlaneAlgo">
       <rParent name="telescope:MinusZArm"/>
       <String name="ChildName" value="telescope:Plane"/>
       <Numeric name="ChildIndex" value="3"/>
@@ -150,7 +150,7 @@
     </Algorithm>
 
     <!-- Plane 4 -->
-    <Algorithm name="phase2TestBeam:DDTelescopePlanesAlgo">
+    <Algorithm name="phase2TestBeam:DDTelescopePlaneAlgo">
       <rParent name="telescope:MinusZArm"/>
       <String name="ChildName" value="telescope:Plane"/>
       <Numeric name="ChildIndex" value="4"/>
@@ -160,7 +160,7 @@
     </Algorithm>
 
     <!-- Plane 5 -->
-    <Algorithm name="phase2TestBeam:DDTelescopePlanesAlgo">
+    <Algorithm name="phase2TestBeam:DDTelescopePlaneAlgo">
       <rParent name="telescope:PlusZArm"/>
       <String name="ChildName" value="telescope:Plane"/>
       <Numeric name="ChildIndex" value="1"/>
@@ -170,7 +170,7 @@
     </Algorithm>
 
     <!-- Plane 6 -->
-    <Algorithm name="phase2TestBeam:DDTelescopePlanesAlgo">
+    <Algorithm name="phase2TestBeam:DDTelescopePlaneAlgo">
       <rParent name="telescope:PlusZArm"/>
       <String name="ChildName" value="telescope:Plane"/>
       <Numeric name="ChildIndex" value="2"/>
@@ -180,7 +180,7 @@
     </Algorithm>
 
     <!-- Plane 7 -->
-    <Algorithm name="phase2TestBeam:DDTelescopePlanesAlgo">
+    <Algorithm name="phase2TestBeam:DDTelescopePlaneAlgo">
       <rParent name="telescope:PlusZArm"/>
       <String name="ChildName" value="telescope:Plane"/>
       <Numeric name="ChildIndex" value="3"/>
@@ -190,7 +190,7 @@
     </Algorithm>
 
     <!-- Plane 8 : the plane located at the biggest Z -->
-    <Algorithm name="phase2TestBeam:DDTelescopePlanesAlgo">
+    <Algorithm name="phase2TestBeam:DDTelescopePlaneAlgo">
       <rParent name="telescope:PlusZArm"/>
       <String name="ChildName" value="telescope:Plane"/>
       <Numeric name="ChildIndex" value="4"/>
