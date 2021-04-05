@@ -38,12 +38,14 @@ void DDTelescopePlaneAlgo::initialize(const DDNumericArguments & nArgs,
   childIndex        = int(nArgs["ChildIndex"]);
   tiltAngle         = nArgs["planeTiltAngle"];
   skewAngle         = nArgs["planeSkewAngle"];
+  orientationAngle  = nArgs["planeOrientationAngle"];
   planeTranslation  = vArgs["planeTranslation"];
   
   LogDebug("DDTelescopePlaneAlgo") << "DDTelescopePlaneAlgo debug: Parameters for positioning"
 			  << " telescope plane index = " << childIndex << " in arm."
 			  << " tiltAngle = " << tiltAngle/CLHEP::deg
-			  << ", skew angle = " << skewAngle/CLHEP::deg;
+			  << ", skew angle = " << skewAngle/CLHEP::deg
+			  << ", orientationAngle = " << orientationAngle/CLHEP::deg;
   
   if (planeTranslation.size() != 3) {
     edm::LogError("DDTelescopePlaneAlgo") << " ERROR - Parameter planeTranslation should be of size 3.";
@@ -68,6 +70,8 @@ void DDTelescopePlaneAlgo::execute(DDCompactView& cpv) {
 
   DDRotation prepaRot, tiltRot, skewRot, globalRot;                      // Default-constructed to identity in SO(3).
   DDRotationMatrix prepaMatrix, tiltMatrix, skewMatrix, globalRotMatrix; // Default-constructed to identity matrix.
+  DDRotation OrientationRot;           // special for Chromini
+  DDRotationMatrix OrientationMatrix;  // special for Chromini
   std::string rotstr = "RTelescopePlaneAlgo";
 
   // prepaMatrix calculus
@@ -128,14 +132,34 @@ void DDTelescopePlaneAlgo::execute(DDCompactView& cpv) {
   skewMatrix = *skewRot.matrix();   // matrix of skewRot
   skewMatrix *= tiltMatrix;         // matrix of (skewRot ◦ tiltRot ◦ prepaRot)
 
+  // Orientation calculus for Chromini
+  // Rotation around CMS_Z.
+  // orienationAngle is counted in the trigonometric sense. 
+  // orienationAngle in [0° 90°].
+  std::string orientationRotstr = rotstr + "Skew" + std::to_string(orientationAngle/CLHEP::deg);
+  OrientationRot = DDRotation(DDName(orientationRotstr, idNameSpace));
+  if (!OrientationRot) {
+    LogDebug("DDTelescopePlaneAlgo") << "DDTelescopePlaneAlgo test: Creating a new rotation: " << orientationRotstr
+			    << "\t" << " 90., "  <<  orientationAngle/CLHEP::deg 
+                             << ", 90., " << 90. + orientationAngle/CLHEP::deg 
+			    << ", 0., 0. ";
+    OrientationRot = DDrot(DDName(orientationRotstr, idNameSpace), 
+		    90.*CLHEP::deg,  orientationAngle, 90.*CLHEP::deg, 90.*CLHEP::deg + orientationAngle, 0., 0.);
+    // counter-trigonometric sense:
+    // OrientationRot = DDrot(DDName(orientationRotstr, idNameSpace), 
+    // 90.*CLHEP::deg - orientationAngle, 0., 90.*CLHEP::deg, 90.*CLHEP::deg, orientationAngle, 180.*CLHEP::deg);
+  }
+  OrientationMatrix = *OrientationRot.matrix();   // matrix of orientationRot
+  OrientationMatrix *= skewMatrix;         // matrix of (orientationRot  * skewRot * tiltRot * prepaRot)
+
   // globalRot def
   std::string globalRotstr = rotstr + "Global";
   globalRot = DDRotation(DDName(globalRotstr, idNameSpace));
   if (!globalRot) {
     LogDebug("DDTelescopePlaneAlgo") << "DDTelescopePlaneAlgo test: Creating a new "
 			    << "rotation: " << globalRotstr;
-    globalRotMatrix = skewMatrix;   
-    // Can finally create globalRot. globalRot = skewRot ◦ tiltRot ◦ prepaRot
+    globalRotMatrix = OrientationMatrix;   
+    // Can finally create globalRot. globalRot = orientationRot * skewRot * tiltRot * prepaRot
     globalRot = DDrot(DDName(globalRotstr, idNameSpace), new DDRotationMatrix(globalRotMatrix)); 
   }
 

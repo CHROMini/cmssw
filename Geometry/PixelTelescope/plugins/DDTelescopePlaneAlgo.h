@@ -38,6 +38,8 @@ private:
                                          // Angle = 0 on (XY) plane. Must be in [0° 90°].
   double        skewAngle;               // Plane rotation around CMS_Y. Angle is counted in the trigonometric sense. 
                                          // Angle = 0 on (XY) plane. Must be in [0° 90°].  
+  double        orientationAngle;        // Plane rotation around CMS_Z. Angle is counted in the trigonometric sense. 
+                                         // Angle = 0 on (XY) plane. Must be in [0° 90°].  
   std::vector<double> planeTranslation;  // Plane translation within arm.
 
   std::string   idNameSpace;    // Namespace of this and ALL sub-parts.

@@ -10,7 +10,8 @@
 
     <!-- TELESCOPE -->
     <!-- WARNING: "Telescope" positioning is relative to "BeamArea" frame of reference. -->
-    <Constant name="TelescopeCenterX" value="500.0*mm"/>
+    <!--Constant name="TelescopeCenterX" value="500.0*mm"-->
+    <Constant name="TelescopeCenterX" value="0.0*mm"/>
     <Constant name="TelescopeCenterY" value="0.*mm"/>
     <Constant name="TelescopeCenterZ" value="0.*mm"/>
 
@@ -23,13 +24,6 @@
     <Constant name="MinusZArmCenterX" value="0.*mm"/>
     <Constant name="MinusZArmCenterY" value="0.*mm"/>
     <Constant name="MinusZArmCenterZ" value="-248.0*mm"/>
-
-    <!-- (+Z) END -->
-    <Constant name="PlusZArmCenterX" value="0.*mm"/>
-    <Constant name="PlusZArmCenterY" value="0.*mm"/>
-    <Constant name="PlusZArmCenterZ" value="248.0*mm"/>
-
-
 
     <!-- PLANE -->
     <!-- WARNING: "Plane" positioning is relative to "Arm" frame of reference. -->
@@ -44,8 +38,11 @@
     <!-- For each plane, if desired, one can put angles / translations values specific to that plane only. -->    
 
     <!-- Define angles constants -->
-    <Constant name="PlaneTiltAngle" value="30.0*deg"/>  <!-- Rotation around CMS_X. Angle is counted in the counter-trigonometric sense. Angle = 0 on (XY) plane. -->
-    <Constant name="PlaneSkewAngle" value="20.0*deg"/>  <!-- Rotation around CMS_Y. Angle is counted in the trigonometric sense. Angle = 0 on (XY) plane. -->
+    <Constant name="PlaneTiltAngle" value="0.0*deg"/>  <!-- Chromini Rotation around CMS_X. Angle is counted in the counter-trigonometric sense. Angle = 0 on (XY) plane. -->
+    <Constant name="PlaneSkewAngle" value="0.0*deg"/>  <!-- Chromini Rotation around CMS_Y. Angle is counted in the trigonometric sense. Angle = 0 on (XY) plane. -->
+    <Constant name="PlaneOrientationAngle" value="90.0*deg"/>  <!-- Chromini Rotation around CMS_Z. Angle is counted in the trigonometric sense. Angle = 0 on (XY) plane. -->
+    <!-- <Constant name="PlaneTiltAngle" value="30.0*deg"/>   Chromie Rotation around CMS_X. Angle is counted in the counter-trigonometric sense. Angle = 0 on (XY) plane. -->
+    <!-- <Constant name="PlaneSkewAngle" value="20.0*deg"/>   Chromie  Rotation around CMS_Y. Angle is counted in the trigonometric sense. Angle = 0 on (XY) plane. -->
     <!-- NB on angles orientation: -->
     <!-- "PlaneTiltAngle" and "PlaneSkewAngle" must be in [0° 90°]. -->
     <!-- If one want to invert the trigonometric sense they are counted in (should not at all be needed!), -->
@@ -54,6 +51,7 @@
     <!-- Plane 1 : the plane located at the lowest Z -->
     <Constant name="Plane1TiltAngle" value="[tuneParameters:PlaneTiltAngle]"/>
     <Constant name="Plane1SkewAngle" value="[tuneParameters:PlaneSkewAngle]"/>
+    <Constant name="Plane1OrientationAngle" value="[tuneParameters:PlaneOrientationAngle]"/>
     <Constant name="Plane1CenterX" value="0.*mm"/>
     <Constant name="Plane1CenterY" value="0.*mm"/>
     <Constant name="Plane1CenterZ" value="-75.0*mm"/>
@@ -61,6 +59,7 @@
     <!-- Plane 2 -->
     <Constant name="Plane2TiltAngle" value="[tuneParameters:PlaneTiltAngle]"/>
     <Constant name="Plane2SkewAngle" value="[tuneParameters:PlaneSkewAngle]"/>
+    <Constant name="Plane2OrientationAngle" value="[tuneParameters:PlaneOrientationAngle]"/>
     <Constant name="Plane2CenterX" value="0.*mm"/>
     <Constant name="Plane2CenterY" value="0.*mm"/>
     <Constant name="Plane2CenterZ" value="-25.0*mm"/>
@@ -68,6 +67,7 @@
     <!-- Plane 3 -->
     <Constant name="Plane3TiltAngle" value="[tuneParameters:PlaneTiltAngle]"/>
     <Constant name="Plane3SkewAngle" value="[tuneParameters:PlaneSkewAngle]"/>
+    <Constant name="Plane3OrientationAngle" value="[tuneParameters:PlaneOrientationAngle]"/>
     <Constant name="Plane3CenterX" value="0.*mm"/>
     <Constant name="Plane3CenterY" value="0.*mm"/>
     <Constant name="Plane3CenterZ" value="25.0*mm"/>
@@ -75,49 +75,23 @@
     <!-- Plane 4 -->
     <Constant name="Plane4TiltAngle" value="[tuneParameters:PlaneTiltAngle]"/>
     <Constant name="Plane4SkewAngle" value="[tuneParameters:PlaneSkewAngle]"/>
+    <Constant name="Plane4OrientationAngle" value="[tuneParameters:PlaneOrientationAngle]"/>
     <Constant name="Plane4CenterX" value="0.*mm"/>
     <Constant name="Plane4CenterY" value="0.*mm"/>
     <Constant name="Plane4CenterZ" value="75.0*mm"/>
-
-    <!-- Plane 5 -->
-    <Constant name="Plane5TiltAngle" value="[tuneParameters:PlaneTiltAngle]"/>
-    <Constant name="Plane5SkewAngle" value="[tuneParameters:PlaneSkewAngle]"/>
-    <Constant name="Plane5CenterX" value="0.*mm"/>
-    <Constant name="Plane5CenterY" value="0.*mm"/>
-    <Constant name="Plane5CenterZ" value="-75.0*mm"/>
-
-    <!-- Plane 6 -->
-    <Constant name="Plane6TiltAngle" value="[tuneParameters:PlaneTiltAngle]"/>
-    <Constant name="Plane6SkewAngle" value="[tuneParameters:PlaneSkewAngle]"/>
-    <Constant name="Plane6CenterX" value="0.*mm"/>
-    <Constant name="Plane6CenterY" value="0.*mm"/>
-    <Constant name="Plane6CenterZ" value="-25.0*mm"/>
-
-    <!-- Plane 7 -->
-    <Constant name="Plane7TiltAngle" value="[tuneParameters:PlaneTiltAngle]"/>
-    <Constant name="Plane7SkewAngle" value="[tuneParameters:PlaneSkewAngle]"/>
-    <Constant name="Plane7CenterX" value="0.*mm"/>
-    <Constant name="Plane7CenterY" value="0.*mm"/>
-    <Constant name="Plane7CenterZ" value="25.0*mm"/>
-
-    <!-- Plane 8 : the plane located at the biggest Z -->
-    <Constant name="Plane8TiltAngle" value="[tuneParameters:PlaneTiltAngle]"/>
-    <Constant name="Plane8SkewAngle" value="[tuneParameters:PlaneSkewAngle]"/>
-    <Constant name="Plane8CenterX" value="0.*mm"/>
-    <Constant name="Plane8CenterY" value="0.*mm"/>
-    <Constant name="Plane8CenterZ" value="75.0*mm"/>
- 
 
 
     <!-- PHASE 1 MODULE -->    
     <!-- WARNING: "Module" positioning is relative to "Plane" frame of reference. -->
                      
-    <Constant name="MovePhase1ModuleInPlaneAlongModuleWidth" value="[telescope:Phase1BPIXModuleWidth] - 8.3*mm"/>    
+    <!--Constant name="MovePhase1ModuleInPlaneAlongModuleWidth" value="[telescope:Phase1BPIXModuleWidth] - 8.3*mm"-->    
     <!-- Total distance between the centres of the two Phase 1 modules, along module width (module local X). -->
     <!-- Calculated 8.3 mm overlap as follows: 
     Measured 10.8 mm overlap, counting the full base plates in width (27 mm total width module instead of 24.5 mm).
     Hence the overlap in between 24.5 mm wide module (which we have in the model) is 10.8 - 2.5 = 8.3 mm.
     -->
+    <Constant name="MovePhase1ModuleInPlaneAlongModuleWidth" value="[telescope:Phase1BPIXModuleWidth] - 9.8*mm "/>    
+    <!-- with a modification for Chromini to force the overlap : 8.3mm + 1.5 mm-->
 
     <Constant name="MovePhase1ModuleInPlaneAlongModuleThickness" value="1.585*mm"/>    
     <!-- Total distance between the centres of the two Phase 1 modules, along module thickness (module local Y). -->
@@ -152,6 +126,7 @@
   </ConstantsSection>
 
 </DDDefinition>
+
 
 
 

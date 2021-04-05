@@ -111,11 +111,6 @@
       <rChild name="telescope:MinusZArm"/>
       <Translation x="[tuneParameters:MinusZArmCenterX]" y="[tuneParameters:MinusZArmCenterY]" z="[tuneParameters:MinusZArmCenterZ]"/>
     </PosPart>
-    <PosPart copyNumber="1">
-      <rParent name="telescope:Telescope"/>
-      <rChild name="telescope:PlusZArm"/>
-      <Translation x="[tuneParameters:PlusZArmCenterX]" y="[tuneParameters:PlusZArmCenterY]" z="[tuneParameters:PlusZArmCenterZ]"/>
-    </PosPart>
 
 
     <!-- PLACE PLANES WITHIN ARM -->
@@ -126,6 +121,7 @@
       <Numeric name="ChildIndex" value="1"/>
       <Numeric name="planeTiltAngle" value="[tuneParameters:Plane1TiltAngle]"/>
       <Numeric name="planeSkewAngle" value="[tuneParameters:Plane1SkewAngle]"/>
+      <Numeric name="planeOrientationAngle" value="[tuneParameters:Plane1OrientationAngle]"/>
       <Vector name="planeTranslation" type="numeric" nEntries="3"> [tuneParameters:Plane1CenterX], [tuneParameters:Plane1CenterY], [tuneParameters:Plane1CenterZ]</Vector>    
     </Algorithm>
 
@@ -136,6 +132,7 @@
       <Numeric name="ChildIndex" value="2"/>
       <Numeric name="planeTiltAngle" value="[tuneParameters:Plane2TiltAngle]"/>
       <Numeric name="planeSkewAngle" value="[tuneParameters:Plane2SkewAngle]"/>
+      <Numeric name="planeOrientationAngle" value="[tuneParameters:Plane2OrientationAngle]"/>
       <Vector name="planeTranslation" type="numeric" nEntries="3"> [tuneParameters:Plane2CenterX], [tuneParameters:Plane2CenterY], [tuneParameters:Plane2CenterZ]</Vector>    
     </Algorithm>
 
@@ -146,6 +143,7 @@
       <Numeric name="ChildIndex" value="3"/>
       <Numeric name="planeTiltAngle" value="[tuneParameters:Plane3TiltAngle]"/>
       <Numeric name="planeSkewAngle" value="[tuneParameters:Plane3SkewAngle]"/>
+      <Numeric name="planeOrientationAngle" value="[tuneParameters:Plane3OrientationAngle]"/>
       <Vector name="planeTranslation" type="numeric" nEntries="3"> [tuneParameters:Plane3CenterX], [tuneParameters:Plane3CenterY], [tuneParameters:Plane3CenterZ]</Vector>    
     </Algorithm>
 
@@ -156,47 +154,8 @@
       <Numeric name="ChildIndex" value="4"/>
       <Numeric name="planeTiltAngle" value="[tuneParameters:Plane4TiltAngle]"/>
       <Numeric name="planeSkewAngle" value="[tuneParameters:Plane4SkewAngle]"/>
+      <Numeric name="planeOrientationAngle" value="[tuneParameters:Plane4OrientationAngle]"/>
       <Vector name="planeTranslation" type="numeric" nEntries="3"> [tuneParameters:Plane4CenterX], [tuneParameters:Plane4CenterY], [tuneParameters:Plane4CenterZ]</Vector>    
-    </Algorithm>
-
-    <!-- Plane 5 -->
-    <Algorithm name="phase2TestBeam:DDTelescopePlaneAlgo">
-      <rParent name="telescope:PlusZArm"/>
-      <String name="ChildName" value="telescope:Plane"/>
-      <Numeric name="ChildIndex" value="1"/>
-      <Numeric name="planeTiltAngle" value="[tuneParameters:Plane5TiltAngle]"/>
-      <Numeric name="planeSkewAngle" value="[tuneParameters:Plane5SkewAngle]"/>
-      <Vector name="planeTranslation" type="numeric" nEntries="3"> [tuneParameters:Plane5CenterX], [tuneParameters:Plane5CenterY], [tuneParameters:Plane5CenterZ]</Vector>    
-    </Algorithm>
-
-    <!-- Plane 6 -->
-    <Algorithm name="phase2TestBeam:DDTelescopePlaneAlgo">
-      <rParent name="telescope:PlusZArm"/>
-      <String name="ChildName" value="telescope:Plane"/>
-      <Numeric name="ChildIndex" value="2"/>
-      <Numeric name="planeTiltAngle" value="[tuneParameters:Plane6TiltAngle]"/>
-      <Numeric name="planeSkewAngle" value="[tuneParameters:Plane6SkewAngle]"/>
-      <Vector name="planeTranslation" type="numeric" nEntries="3"> [tuneParameters:Plane6CenterX], [tuneParameters:Plane6CenterY], [tuneParameters:Plane6CenterZ]</Vector>    
-    </Algorithm>
-
-    <!-- Plane 7 -->
-    <Algorithm name="phase2TestBeam:DDTelescopePlaneAlgo">
-      <rParent name="telescope:PlusZArm"/>
-      <String name="ChildName" value="telescope:Plane"/>
-      <Numeric name="ChildIndex" value="3"/>
-      <Numeric name="planeTiltAngle" value="[tuneParameters:Plane7TiltAngle]"/>
-      <Numeric name="planeSkewAngle" value="[tuneParameters:Plane7SkewAngle]"/>
-      <Vector name="planeTranslation" type="numeric" nEntries="3"> [tuneParameters:Plane7CenterX], [tuneParameters:Plane7CenterY], [tuneParameters:Plane7CenterZ]</Vector>    
-    </Algorithm>
-
-    <!-- Plane 8 : the plane located at the biggest Z -->
-    <Algorithm name="phase2TestBeam:DDTelescopePlaneAlgo">
-      <rParent name="telescope:PlusZArm"/>
-      <String name="ChildName" value="telescope:Plane"/>
-      <Numeric name="ChildIndex" value="4"/>
-      <Numeric name="planeTiltAngle" value="[tuneParameters:Plane8TiltAngle]"/>
-      <Numeric name="planeSkewAngle" value="[tuneParameters:Plane8SkewAngle]"/>
-      <Vector name="planeTranslation" type="numeric" nEntries="3"> [tuneParameters:Plane8CenterX], [tuneParameters:Plane8CenterY], [tuneParameters:Plane8CenterZ]</Vector>    
     </Algorithm>
 
 
