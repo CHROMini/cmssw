@@ -51,7 +51,7 @@ void CmsTrackerOTLayerBuilder::sortNS(DDFilteredView& fv, GeometricDet* det){
     } else if(component->type()== GeometricDet::panel){
       if(component->translation().z() < 0.){
         ringsNeg.emplace_back(component);
-      } else if (component->translation().z() > 0.) {
+      } else if (component->translation().z() >= 0.) {
         ringsPos.emplace_back(component);
       }
     } else {

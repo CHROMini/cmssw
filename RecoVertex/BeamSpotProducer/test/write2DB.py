@@ -6,11 +6,12 @@ process.load("FWCore.MessageLogger.MessageLogger_cfi")
 
 
 process.load("CondCore.DBCommon.CondDBCommon_cfi")
+#process.load("CondCore.CondDB.CondDB_cfi")
 
 #################################
 # Produce a SQLITE FILE
 #
-process.CondDBCommon.connect = "sqlite_file:Early900GeVCollision_7p4cm_STARTUP_mc.db"
+process.CondDBCommon.connect = "sqlite_file:pixel_telescope_beamspot.db"
 process.CondDBCommon.DBParameters.authenticationPath = '/afs/cern.ch/cms/DB/conddb'
 #################################
 #
@@ -26,7 +27,8 @@ process.PoolDBOutputService = cms.Service("PoolDBOutputService",
                                           process.CondDBCommon,
                                           toPut = cms.VPSet(cms.PSet(
     record = cms.string('BeamSpotObjectsRcd'),
-    tag = cms.string('Early900GeVCollision_7p4cm_STARTUP_mc') )),
+    #tag = cms.string('Early900GeVCollision_7p4cm_STARTUP_mc') )),
+    tag = cms.string('pixel_telescope_beamspot_tag') )),
     loadBlobStreamer = cms.untracked.bool(False)
 )
 
@@ -38,7 +40,7 @@ process.maxEvents = cms.untracked.PSet(
             input = cms.untracked.int32(1)
                     )
 process.beamspot = cms.EDAnalyzer("BeamSpotWrite2DB",
-                                OutputFileName = cms.untracked.string('BFMC900GeVstartup.txt')
+                                OutputFileName = cms.untracked.string('BeamTemplate.txt')
                                 )
 
 

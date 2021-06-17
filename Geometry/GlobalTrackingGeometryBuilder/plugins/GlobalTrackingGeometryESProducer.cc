@@ -45,7 +45,7 @@ GlobalTrackingGeometryESProducer::produce(const GlobalTrackingGeometryRecord& re
     LogWarning("GeometryGlobalTrackingGeometryBuilder") << "No TrackerDigiGeometryRecord is available.";    
   }
 
-
+  /*
   try {
     edm::ESHandle<DTGeometry> dtH;
     record.getRecord<MuonGeometryRecord>().get(dtH);
@@ -90,6 +90,7 @@ GlobalTrackingGeometryESProducer::produce(const GlobalTrackingGeometryRecord& re
   } catch (edm::eventsetup::NoRecordException<MuonGeometryRecord>& e){
     LogWarning("GeometryGlobalTrackingGeometryBuilder") << "No MuonGeometryRecord is available.";    
   }
+  */
 
   GlobalTrackingGeometryBuilder builder;
   return std::shared_ptr<GlobalTrackingGeometry>(builder.build(tk, dt, csc, rpc, gem, me0));

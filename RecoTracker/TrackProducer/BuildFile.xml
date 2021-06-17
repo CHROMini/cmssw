@@ -24,6 +24,11 @@
 <use   name="TrackingTools/TrajectoryState"/>
 <use   name="TrackingTools/KalmanUpdators"/>
 <use   name="Utilities/General"/>
+
+<use name="CondFormats/DataRecord"/>
+<use name="DataFormats/BeamSpot"/>
+<use name="CondFormats/BeamSpotObjects"/>
+
 <export>
   <lib   name="1"/>
 </export>

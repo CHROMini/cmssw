@@ -3,6 +3,7 @@ import FWCore.ParameterSet.Config as cms
 from RecoTracker.TkSeedingLayers.seedingLayersEDProducer_cfi import *
 
 PixelLayerPairs = seedingLayersEDProducer.clone()
+
 PixelLayerPairs.layerList = cms.vstring('BPix1+BPix2', 
         'BPix1+BPix3', 
         'BPix2+BPix3', 
@@ -17,10 +18,12 @@ PixelLayerPairs.layerList = cms.vstring('BPix1+BPix2',
         'FPix1_pos+FPix2_pos', 
         'FPix1_neg+FPix2_neg'
 )
+
 PixelLayerPairs.BPix = cms.PSet(
     TTRHBuilder = cms.string('WithTrackAngle'),
     HitProducer = cms.string('siPixelRecHits'),
 )
+
 PixelLayerPairs.FPix = cms.PSet(
     TTRHBuilder = cms.string('WithTrackAngle'),
     HitProducer = cms.string('siPixelRecHits'),

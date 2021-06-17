@@ -47,8 +47,10 @@ SeedingLayerSetsBuilder::SeedingLayerId SeedingLayerSetsBuilder::nameToEnumId(co
     // FPIX
     //
     else if ((index = name.find("FPix")) != string::npos) {
+      std::cout << "name = " << name << std::endl;
       subdet = GeomDetEnumerators::PixelEndcap;
       idLayer = atoi(name.substr(index+4).c_str());
+      std::cout << "idLayer = " << idLayer << std::endl;
       if ( name.find("pos") != string::npos ) {
         side = TrackerDetSide::PosEndcap;
       } else {
@@ -110,10 +112,10 @@ SeedingLayerSetsBuilder::LayerSpec::LayerSpec(unsigned short index, const std::s
 
   bool skipClusters = cfgLayer.exists("skipClusters");
   if (skipClusters) {
-    LogDebug("SeedingLayerSetsBuilder")<<layerName<<" ready for skipping";
+    std::cout << "SeedingLayerSetsBuilder " << layerName <<" ready for skipping" << std::endl;
   }
   else{
-    LogDebug("SeedingLayerSetsBuilder")<<layerName<<" not skipping ";
+    std::cout << "SeedingLayerSetsBuilder " << layerName <<" not skipping " << std::endl;
   }
 
   auto subdetData = nameToEnumId(layerName);

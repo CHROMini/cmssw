@@ -1,0 +1,39 @@
+%MSG-i SiPixelQualityESProducer::SiPixelQualityESProducer:  (NoModuleName)  27-Aug-2018 14:40:50 CEST pre-events
+
+%MSG
+%MSG-i SiStripBackPlaneCorrectionDepESProducer:  (NoModuleName)  27-Aug-2018 14:40:50 CEST pre-events
+ctor
+%MSG
+%MSG-i SiStripLorentzAngleDepESProducer:  (NoModuleName)  27-Aug-2018 14:40:50 CEST pre-events
+ctor
+%MSG
+%MSG-i SiStripQualityESProducer:  (NoModuleName) 27-Aug-2018 14:40:50 CEST  pre-events
+ctor
+%MSG
+%MSG-i Geometry:  (NoModuleName) TrackerDigiGeometryESModule()  27-Aug-2018 14:40:50 CEST pre-events
+Label '' IGNORING alignment labels ''.
+%MSG
+%MSG-i TRACKER:  (NoModuleName) 27-Aug-2018 14:40:50 CEST pre-events
+TrackerTopologyEP::TrackerTopologyEP
+%MSG
+%MSG-i HCAL:  (NoModuleName) 27-Aug-2018 14:40:50 CEST pre-events
+HcalHardcodeCalibrations::HcalHardcodeCalibrations->...
+%MSG
+27-Aug-2018 14:40:53 CEST  Initiating request to open file file:/afs/cern.ch/work/m/mersi/public/Chromie/RAW/run100208/run100208_ls0004_RAW.root
+27-Aug-2018 14:40:54 CEST  Successfully opened file file:/afs/cern.ch/work/m/mersi/public/Chromie/RAW/run100208/run100208_ls0004_RAW.root
+%MSG-i SiPixelRawToDigi:  SiPixelRawToDigi:siPixelDigis@ctor  27-Aug-2018 14:40:54 CEST pre-events
+ Using phase1
+%MSG
+%MSG-i SiPixelGainCalibrationServicePayloadGetter:   SiPixelClusterProducer:siPixelClusters@ctor 27-Aug-2018 14:40:54 CEST  pre-events
+[SiPixelGainCalibrationServicePayloadGetter::SiPixelGainCalibrationServicePayloadGetter]
+%MSG
+%MSG-i SiPixelRawToDigi:  AfterModConstruction 27-Aug-2018 14:40:54 CEST  pre-events
+ HERE ** SiPixelRawToDigi destructor!
+%MSG
+27-Aug-2018 14:40:54 CEST  Closed file file:/afs/cern.ch/work/m/mersi/public/Chromie/RAW/run100208/run100208_ls0004_RAW.root
+----- Begin Fatal Exception 27-Aug-2018 14:40:54 CEST-----------------------
+An exception of category 'PluginNotFound' occurred while
+   [0] Constructing the EventProcessor
+Exception Message:
+Unable to find plugin 'PixelTelescopeSpecialSeedGenerator' in category 'CMS EDM Framework Module'. Please check spelling of name.
+----- End Fatal Exception -------------------------------------------------

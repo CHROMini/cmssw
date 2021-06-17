@@ -103,6 +103,7 @@ public:
   bool trajectoryInEvent_;
   edm::OrphanHandle<TrackCollection> rTracks_;
   edm::EDGetTokenT<reco::BeamSpot> bsSrc_;
+  reco::BeamSpot myBeamSpot_;
   edm::EDGetTokenT<MeasurementTrackerEvent> mteSrc_;
 
   bool rekeyClusterRefs_;

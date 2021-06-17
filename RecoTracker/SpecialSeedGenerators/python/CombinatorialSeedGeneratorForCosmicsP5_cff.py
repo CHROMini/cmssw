@@ -76,11 +76,22 @@ combinatorialcosmicseedingpairsTECnegP5 = cms.EDProducer("SeedingLayersEDProduce
         maxRing = cms.int32(7)
     )
 )
+
+combinatorialcosmicseedingtripletsPixelTelescopeP5 = cms.EDProducer("SeedingLayersEDProducer",
+    layerList = cms.vstring('FPix2_neg+FPix3_neg+FPix4_neg'),
+    FPix = cms.PSet(
+    	TTRHBuilder = cms.string('WithTrackAngle'),
+    	HitProducer = cms.string('siPixelRecHits'),
+    )    
+)
+
+
 combinatorialcosmicseedinglayersP5 = cms.Sequence(
-    combinatorialcosmicseedingtripletsP5 +
-    combinatorialcosmicseedingpairsTOBP5 +
-    combinatorialcosmicseedingpairsTECposP5 +
-    combinatorialcosmicseedingpairsTECnegP5
+    #combinatorialcosmicseedingtripletsP5 +
+    #combinatorialcosmicseedingpairsTOBP5 +
+    #combinatorialcosmicseedingpairsTECposP5 +
+    #combinatorialcosmicseedingpairsTECnegP5
+    combinatorialcosmicseedingtripletsPixelTelescopeP5
 )
 #recHitMatcher
 #include "RecoLocalTracker/SiStripRecHitConverter/data/SiStripRecHitMatcher.cfi"
@@ -89,12 +100,13 @@ combinatorialcosmicseedfinderP5 = copy.deepcopy(combinatorialcosmicseedfinder)
 #replace combinatorialcosmicseedfinderP5.SetMomentum = false
 combinatorialcosmicseedfinderP5.requireBOFF = True
 combinatorialcosmicseedfinderP5.UseScintillatorsConstraint = False
-combinatorialcosmicseedfinderP5.OrderedHitsFactoryPSets = cms.VPSet(cms.PSet(
-    ComponentName = cms.string('GenericTripletGenerator'),
-    LayerSrc = cms.InputTag("combinatorialcosmicseedingtripletsP5"),
-    PropagationDirection = cms.string('alongMomentum'),
-    NavigationDirection = cms.string('outsideIn')
-), 
+combinatorialcosmicseedfinderP5.OrderedHitsFactoryPSets = cms.VPSet(
+    cms.PSet(
+        ComponentName = cms.string('GenericTripletGenerator'),
+        LayerSrc = cms.InputTag("combinatorialcosmicseedingtripletsP5"),
+        PropagationDirection = cms.string('alongMomentum'),
+        NavigationDirection = cms.string('outsideIn')
+    ), 
     cms.PSet(
         ComponentName = cms.string('GenericPairGenerator'),
         LayerSrc = cms.InputTag("combinatorialcosmicseedingpairsTOBP5"),
@@ -124,5 +136,13 @@ combinatorialcosmicseedfinderP5.OrderedHitsFactoryPSets = cms.VPSet(cms.PSet(
         LayerSrc = cms.InputTag("combinatorialcosmicseedingpairsTECnegP5"),
         PropagationDirection = cms.string('alongMomentum'),
         NavigationDirection = cms.string('insideOut')
-    ))
+    ), 
+    cms.PSet(
+        ComponentName = cms.string('GenericTripletGenerator'),
+        LayerSrc = cms.InputTag("combinatorialcosmicseedingtripletsPixelTelescopeP5"),
+        PropagationDirection = cms.string('alongMomentum'),
+        NavigationDirection = cms.string('outsideIn')
+    )
+    
+    )
 

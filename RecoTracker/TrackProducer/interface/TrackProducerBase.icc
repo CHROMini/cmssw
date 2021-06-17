@@ -32,6 +32,9 @@
 
 #include "DataFormats/DetId/interface/DetId.h"
 
+#include "CondFormats/DataRecord/interface/BeamSpotObjectsRcd.h"
+#include "CondFormats/BeamSpotObjects/interface/BeamSpotObjects.h"
+
 //destructor
 template <class T>
 TrackProducerBase<T>::~TrackProducerBase() noexcept(false) { }
@@ -110,6 +113,47 @@ TrackProducerBase<T>::getFromES(const edm::EventSetup& setup,
     theSchool = edm::ESHandle<NavigationSchool>(); //put an invalid handle
     theMeasTk = edm::ESHandle<MeasurementTracker>(); //put an invalid handle
   }
+
+
+
+
+  //get the BeamSpot	
+edm::ESHandle< BeamSpotObjects > beamhandle;
+	setup.get<BeamSpotObjectsRcd>().get(beamhandle);
+	const BeamSpotObjects *spotDB = beamhandle.product();
+
+
+  // translate from BeamSpotObjects to reco::BeamSpot
+  reco::BeamSpot::Point apoint( spotDB->GetX(), spotDB->GetY(), spotDB->GetZ() );
+  
+  reco::BeamSpot::CovarianceMatrix matrix;
+  for ( int i=0; i<7; ++i ) {
+    for ( int j=0; j<7; ++j ) {
+      matrix(i,j) = spotDB->GetCovariance(i,j);
+    }
+  }
+  
+  reco::BeamSpot aSpot;
+  // this assume beam width same in x and y
+  aSpot = reco::BeamSpot( apoint,
+			  spotDB->GetSigmaZ(),
+			  spotDB->Getdxdz(),
+			  spotDB->Getdydz(),
+			  spotDB->GetBeamWidthX(),
+			  matrix );
+  aSpot.setBeamWidthY( spotDB->GetBeamWidthY() );
+  aSpot.setEmittanceX( spotDB->GetEmittanceX() );
+  aSpot.setEmittanceY( spotDB->GetEmittanceY() );
+  aSpot.setbetaStar( spotDB->GetBetaStar() );
+
+  if ( spotDB->GetBeamType() == 2 ) {
+    aSpot.setType( reco::BeamSpot::Tracker );
+  } else{
+    aSpot.setType( reco::BeamSpot::Fake );
+  }
+
+myBeamSpot_ = aSpot;
+
 }
 
 template <class T> void
@@ -123,12 +167,14 @@ TrackProducerBase<T>::getFromEvt(edm::Event& theEvent,edm::Handle<TrackCandidate
   theEvent.getByToken(src_,theTCCollection );  
 
   //get the BeamSpot
-  edm::Handle<reco::BeamSpot> recoBeamSpotHandle;
-  theEvent.getByToken(bsSrc_,recoBeamSpotHandle);
-  if ( recoBeamSpotHandle.isValid() )
-    bs = *recoBeamSpotHandle;
-  else 
-    edm::LogWarning("TrackProducerBase") << " BeamSpot is not valid";
+  //edm::Handle<reco::BeamSpot> recoBeamSpotHandle;
+  //theEvent.getByToken(bsSrc_,recoBeamSpotHandle);
+  //if ( recoBeamSpotHandle.isValid() )
+    //bs = *recoBeamSpotHandle;
+  //else 
+    //edm::LogWarning("TrackProducerBase") << " BeamSpot is not valid";
+bs = myBeamSpot_;
+if (bs.x0() < 40 ) { edm::LogWarning("TrackProducerBase") << " BeamSpot is not valid"; }				   
 }
 
 template <class T> void
@@ -142,12 +188,15 @@ TrackProducerBase<T>::getFromEvt(edm::Event& theEvent,edm::Handle<TrackView>& th
   theEvent.getByToken(src_,theTCollection );  
 
   //get the BeamSpot
-  edm::Handle<reco::BeamSpot> recoBeamSpotHandle;
-  theEvent.getByToken(bsSrc_,recoBeamSpotHandle);
-  if ( recoBeamSpotHandle.isValid() )
-    bs = *recoBeamSpotHandle;
-  else 
-    edm::LogWarning("TrackProducerBase") << " BeamSpot is not valid";
+  //edm::Handle<reco::BeamSpot> recoBeamSpotHandle;
+  //theEvent.getByToken(bsSrc_,recoBeamSpotHandle);
+  //if ( recoBeamSpotHandle.isValid() )
+    //bs = *recoBeamSpotHandle;
+  //else 
+    //edm::LogWarning("TrackProducerBase") << " BeamSpot is not valid";
+bs = myBeamSpot_;
+if (bs.x0() < 40 ) { edm::LogWarning("TrackProducerBase") << " BeamSpot is not valid"; }
+			   
 }
 
 #include <TrackingTools/DetLayers/interface/DetLayer.h>

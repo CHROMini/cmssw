@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+
+<DDDefinition xmlns="http://www.cern.ch/cms/DDL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.cern.ch/cms/DDL ../../../DetectorDescription/Schema/DDLSchema.xsd">
+  <SpecParSection label="pixelTelescopeSensitive.xml">
+
+    <!-- PHASE 1 PIXEL SENSORS -->
+    <SpecPar name="ROUHitsTrackerPixelEndcap">   <!-- NB: or "ROUHitsTrackerPixelBarrel", as they are Barrel modules? -->
+      <PartSelector path="//Phase1BPIXLayer4Module:PixelBarrelActiveFull3" />
+      <Parameter name="SensitiveDetector" value="TkAccumulatingSensitiveDetector" />  <!-- SimG4CMS/Tracker/src/TkAccumulatingSensitiveDetector.cc relies on this -->
+      <Parameter name="ReadOutName" value="TrackerHitsPixelEndcap" />
+    </SpecPar>
+
+    <!-- DUT --> 
+    <!-- UNCOMMENT THIS TO ADD DUT.
+	 <SpecPar name="DUTActive">
+	 <PartSelector path="//DUT:BModule1Layer6Lower2Sactive"/>
+	 <PartSelector path="//DUT:BModule1Layer6Upper2Sactive"/>
+	 <Parameter name="SensitiveDetector" value="TkAccumulatingSensitiveDetector" />  
+	 <Parameter name="ReadOutName" value="TrackerHitsPixelBarrel" />
+	 </SpecPar>
+    -->
+
+  </SpecParSection>
+</DDDefinition>
+

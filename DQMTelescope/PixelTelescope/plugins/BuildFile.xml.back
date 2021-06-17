@@ -1,0 +1,17 @@
+<use name="FWCore/Framework"/>
+<use name="FWCore/PluginManager"/>
+<use name="FWCore/ParameterSet"/>
+
+<use name="CommonTools/UtilAlgos"/>
+<use name="FWCore/Utilities"/>
+
+<use name="DataFormats/SiPixelDetId"/>
+<use name="Geometry/TrackerGeometryBuilder"/>
+<use name="FWCore/MessageLogger"/>
+
+<use name="RecoLocalTracker/ClusterParameterEstimator"/>
+<use name="RecoLocalTracker/Records"/>
+<use name="RecoLocalTracker/SiPixelRecHits"/>
+<use name="DataFormats/TrackerCommon"/>
+
+<flags EDM_PLUGIN="1"/>

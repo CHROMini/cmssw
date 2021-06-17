@@ -1,0 +1,132 @@
+<?xml version="1.0"?>
+
+<DDDefinition xmlns="http://www.cern.ch/cms/DDL" xmlns:xsi="http://www.cern.ch/www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.cern.ch/cms/DDL ../../../DetectorDescription/Schema/DDLSchema.xsd">
+
+  <!-- TUNE THESE PARAMETERS AS MUCH AS YOU WANT ! -->
+
+  <ConstantsSection label="tuneParameters.xml" eval="true">
+
+
+
+    <!-- TELESCOPE -->
+    <!-- WARNING: "Telescope" positioning is relative to "BeamArea" frame of reference. -->
+    <!--Constant name="TelescopeCenterX" value="500.0*mm"-->
+    <Constant name="TelescopeCenterX" value="0.0*mm"/>
+    <Constant name="TelescopeCenterY" value="0.*mm"/>
+    <Constant name="TelescopeCenterZ" value="0.*mm"/>
+
+
+
+    <!-- ARM -->
+    <!-- WARNING: "Arm" positioning is relative to "Telescope" frame of reference. -->
+
+    <!-- (-Z) END -->
+    <Constant name="MinusZArmCenterX" value="0.*mm"/>
+    <Constant name="MinusZArmCenterY" value="0.*mm"/>
+    <Constant name="MinusZArmCenterZ" value="-248.0*mm"/>
+
+    <!-- PLANE -->
+    <!-- WARNING: "Plane" positioning is relative to "Arm" frame of reference. -->
+
+    <!-- NB on plane numbering: -->
+    <!-- The plane numbering here is only used for the XML variables, this has nothing to do with CMSSW topology!!. -->
+    <!-- The plane numbering simply follows increasing Z. -->
+    <!-- Plane 1 is the plane located at the lowest Z. -->
+    <!-- Plane 8 is the plane located at the biggest Z. -->
+
+    <!-- NB on plane customization: -->
+    <!-- For each plane, if desired, one can put angles / translations values specific to that plane only. -->    
+
+    <!-- Define angles constants -->
+    <Constant name="PlaneTiltAngle" value="0.0*deg"/>  <!-- Chromini Rotation around CMS_X. Angle is counted in the counter-trigonometric sense. Angle = 0 on (XY) plane. -->
+    <Constant name="PlaneSkewAngle" value="0.0*deg"/>  <!-- Chromini Rotation around CMS_Y. Angle is counted in the trigonometric sense. Angle = 0 on (XY) plane. -->
+    <Constant name="PlaneOrientationAngle" value="90.0*deg"/>  <!-- Chromini Rotation around CMS_Z. Angle is counted in the trigonometric sense. Angle = 0 on (XY) plane. -->
+    <!-- <Constant name="PlaneTiltAngle" value="30.0*deg"/>   Chromie Rotation around CMS_X. Angle is counted in the counter-trigonometric sense. Angle = 0 on (XY) plane. -->
+    <!-- <Constant name="PlaneSkewAngle" value="20.0*deg"/>   Chromie  Rotation around CMS_Y. Angle is counted in the trigonometric sense. Angle = 0 on (XY) plane. -->
+    <!-- NB on angles orientation: -->
+    <!-- "PlaneTiltAngle" and "PlaneSkewAngle" must be in [0° 90°]. -->
+    <!-- If one want to invert the trigonometric sense they are counted in (should not at all be needed!), -->
+    <!-- simply uncomment 2 lines in DDTelescopePlaneAlgo as precisely described in plugins/DDTelescopePlaneAlgo.cc -->
+
+    <!-- Plane 1 : the plane located at the lowest Z -->
+    <Constant name="Plane1TiltAngle" value="[tuneParameters:PlaneTiltAngle]"/>
+    <Constant name="Plane1SkewAngle" value="[tuneParameters:PlaneSkewAngle]"/>
+    <Constant name="Plane1OrientationAngle" value="[tuneParameters:PlaneOrientationAngle]"/>
+    <Constant name="Plane1CenterX" value="0.*mm"/>
+    <Constant name="Plane1CenterY" value="0.*mm"/>
+    <Constant name="Plane1CenterZ" value="-75.0*mm"/>
+
+    <!-- Plane 2 -->
+    <Constant name="Plane2TiltAngle" value="[tuneParameters:PlaneTiltAngle]"/>
+    <Constant name="Plane2SkewAngle" value="[tuneParameters:PlaneSkewAngle]"/>
+    <Constant name="Plane2OrientationAngle" value="[tuneParameters:PlaneOrientationAngle]"/>
+    <Constant name="Plane2CenterX" value="0.*mm"/>
+    <Constant name="Plane2CenterY" value="0.*mm"/>
+    <Constant name="Plane2CenterZ" value="-25.0*mm"/>
+
+    <!-- Plane 3 -->
+    <Constant name="Plane3TiltAngle" value="[tuneParameters:PlaneTiltAngle]"/>
+    <Constant name="Plane3SkewAngle" value="[tuneParameters:PlaneSkewAngle]"/>
+    <Constant name="Plane3OrientationAngle" value="[tuneParameters:PlaneOrientationAngle]"/>
+    <Constant name="Plane3CenterX" value="0.*mm"/>
+    <Constant name="Plane3CenterY" value="0.*mm"/>
+    <Constant name="Plane3CenterZ" value="25.0*mm"/>
+
+    <!-- Plane 4 -->
+    <Constant name="Plane4TiltAngle" value="[tuneParameters:PlaneTiltAngle]"/>
+    <Constant name="Plane4SkewAngle" value="[tuneParameters:PlaneSkewAngle]"/>
+    <Constant name="Plane4OrientationAngle" value="[tuneParameters:PlaneOrientationAngle]"/>
+    <Constant name="Plane4CenterX" value="0.*mm"/>
+    <Constant name="Plane4CenterY" value="0.*mm"/>
+    <Constant name="Plane4CenterZ" value="75.0*mm"/>
+
+
+    <!-- PHASE 1 MODULE -->    
+    <!-- WARNING: "Module" positioning is relative to "Plane" frame of reference. -->
+                     
+    <!--Constant name="MovePhase1ModuleInPlaneAlongModuleWidth" value="[telescope:Phase1BPIXModuleWidth] - 8.3*mm"-->    
+    <!-- Total distance between the centres of the two Phase 1 modules, along module width (module local X). -->
+    <!-- Calculated 8.3 mm overlap as follows: 
+    Measured 10.8 mm overlap, counting the full base plates in width (27 mm total width module instead of 24.5 mm).
+    Hence the overlap in between 24.5 mm wide module (which we have in the model) is 10.8 - 2.5 = 8.3 mm.
+    -->
+    <Constant name="MovePhase1ModuleInPlaneAlongModuleWidth" value="[telescope:Phase1BPIXModuleWidth] - 9.8*mm "/>    
+    <!-- with a modification for Chromini to force the overlap : 8.3mm + 1.5 mm-->
+
+    <Constant name="MovePhase1ModuleInPlaneAlongModuleThickness" value="1.585*mm"/>    
+    <!-- Total distance between the centres of the two Phase 1 modules, along module thickness (module local Y). -->
+    <!-- Calculated as follows: 
+    Module thickness = 1.28 mm, hence module center is at 0.64 mm from module most external surface.  
+    Sensor has an offset of 0.1225 mm inwards (towards telescope plane).
+    Hence sensor center is at 0.64 - 0.1225 = 0.5175 mm from module most external surface.
+    There is a 0.55 mm gap between the 2 modules most external surfaces.
+    Hence the total distance between sensor centers is 2 * 0.5175 + 0.55 = 1.585 mm.
+    -->
+
+
+
+    <!-- DUT: -->
+    <!-- WARNING: "DUT" positioning is relative to "Telescope" frame of reference. -->
+
+    <!-- DUT translation -->
+    <Constant name="DUTTransX" value="0.0*mm"/>         <!-- Total DUT Holder translation along X axis -->
+    <Constant name="DUTTransY" value="0.0*mm"/>         <!-- Total DUT Holder translation along Y axis -->
+    <Constant name="DUTTransZ" value="0.0*mm"/>         <!-- Total DUT Holder translation along Z axis --> 
+    <!-- TO DO!! Tune this as desire. Please not that 0. might cause issue, -->
+    <!-- as was not expected to have tilted rings at 0. at the first place (minor correction was needed in CMSSW code). -->
+
+    <!-- DUT rotation -->
+    <Constant name="DUTSkewAngle" value="10.0*deg"/>    <!-- Angle around Y, counted from (XY) plane. -->
+    <!-- Angle is in [0 20] deg. -->
+    <!-- No negative value!! -->
+    <!-- If angle >= 0, please use DUTSkewPlus in telescope.xml -->
+    <!-- If angle < 0, please use DUTSkewMinus in telescope.xml -->
+
+
+  </ConstantsSection>
+
+</DDDefinition>
+
+
+
+

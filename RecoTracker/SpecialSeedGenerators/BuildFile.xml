@@ -24,6 +24,7 @@
 <use   name="RecoTracker/TkSeedingLayers"/>
 <use   name="RecoTracker/TkTrackingRegions"/>
 <use   name="RecoTracker/TransientTrackingRecHit"/>
+<!--use   name="RecoTracker/SpecialSeedGenerators"/-->
 <use   name="TrackingTools/DetLayers"/>
 <use   name="TrackingTools/GeomPropagators"/>
 <use   name="TrackingTools/KalmanUpdators"/>

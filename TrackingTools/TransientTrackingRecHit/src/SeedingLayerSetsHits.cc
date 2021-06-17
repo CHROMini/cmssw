@@ -29,6 +29,8 @@ void SeedingLayerSetsHits::addHits(LayerIndex layerIndex, OwnedHits&& hits) {
 
   layerHitIndices_.push_back(rechits_.size());
   std::move(hits.begin(), hits.end(), std::back_inserter(rechits_));
+
+  std::cout << "SeedingLayerSetsHits::addHits   rechits_.size() = " << rechits_.size() << std::endl;
 }
 
 SeedingLayerSetsHits::Hits SeedingLayerSetsHits::hits(LayerIndex layerIndex) const {

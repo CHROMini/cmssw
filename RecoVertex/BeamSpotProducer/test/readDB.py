@@ -6,16 +6,16 @@ process.load("FWCore.MessageLogger.MessageLogger_cfi")
 
 
 process.load("CondCore.DBCommon.CondDBSetup_cfi")
-
+#process.load("CondCore.CondDB.CondDB_cfi")
 
 
 process.BeamSpotDBSource = cms.ESSource("PoolDBESSource",
                                         process.CondDBSetup,
                                         toGet = cms.VPSet(cms.PSet(
     record = cms.string('BeamSpotObjectsRcd'),
-    tag = cms.string('Early900GeVCollision_7p4cm_STARTUP_mc')
+    tag = cms.string('pixel_telescope_beamspot_tag')
     )),
-                                        connect = cms.string('sqlite_file:Early900GeVCollision_7p4cm_STARTUP_mc.db')
+                                        connect = cms.string('sqlite_file:pixel_telescope_beamspot.db')
                                         #connect = cms.string('oracle://cms_orcoff_prod/CMS_COND_31X_BEAMSPOT')
                                         #connect = cms.string('frontier://PromptProd/CMS_COND_31X_BEAMSPOT')
                                         )

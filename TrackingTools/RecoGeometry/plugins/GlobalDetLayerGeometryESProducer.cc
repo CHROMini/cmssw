@@ -22,12 +22,13 @@ std::unique_ptr<DetLayerGeometry>
 GlobalDetLayerGeometryESProducer::produce(const RecoGeometryRecord & iRecord){ 
   
   edm::ESHandle<GeometricSearchTracker> tracker;  
-  edm::ESHandle<MuonDetLayerGeometry> muon;
+  //edm::ESHandle<MuonDetLayerGeometry> muon;
 
   iRecord.getRecord<TrackerRecoGeometryRecord>().get(tracker);
-  iRecord.getRecord<MuonRecoGeometryRecord>().get(muon);
+  //iRecord.getRecord<MuonRecoGeometryRecord>().get(muon);
 
-  return std::make_unique<GlobalDetLayerGeometry>(tracker.product(), muon.product());
+  //return std::make_unique<GlobalDetLayerGeometry>(tracker.product(), muon.product());
+  return std::make_unique<GlobalDetLayerGeometry>(tracker.product(), nullptr);
 }
 
 
