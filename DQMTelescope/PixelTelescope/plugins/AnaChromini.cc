@@ -87,57 +87,86 @@ class AnaChromini : public edm::one::EDAnalyzer<edm::one::SharedResources>  {
 
     // ----------member data ---------------------------
 
-    edm::EDGetTokenT<TrackCollection> tracksToken_ ;  //used to select what tracks to read from configuration file
-      
     edm::Service<TFileService> fs ;
+    
+    // Get specific data
+    edm::EDGetTokenT<edm::DetSetVector<PixelDigi>> pixelDigiToken_ ;
+    edm::EDGetTokenT<edmNew::DetSetVector<SiPixelRecHit>> pixelHitToken_ ;
+    edm::EDGetTokenT<edmNew::DetSetVector<SiPixelCluster>> pixelClusterToken_ ;
+    edm::EDGetTokenT<TrackCollection> trackToken_ ;
+     
+    // Module IDs and names
+    std::vector<TString> module_names;
+    std::vector<uint32_t> module_det_ids;
+    std::map<int, TString> det_id_to_module_name;
+    std::map<TString, int> module_name_to_det_id;
+    std::map<TString, std::vector<double>> module_name_to_position;
+     
+    // Content of the output ROOT file
+    
+    // Histograms per module
+    std::map<uint32_t, TH1F*> hist_dqm_digi_column_position;
+    std::map<uint32_t, TH1F*> hist_dqm_digi_row_position;
+    std::map<uint32_t, TH2F*> hist_dqm_digi_2d_position;
+    std::map<uint32_t, TH1F*> hist_dqm_n_digis;
+    
+    std::map<uint32_t, TH1F*> hist_dqm_cluster_local_x_position;
+    std::map<uint32_t, TH1F*> hist_dqm_cluster_local_y_position;
+    std::map<uint32_t, TH2F*> hist_dqm_cluster_local_2d_position;
+    
+    std::map<uint32_t, TH1F*> hist_dqm_cluster_global_x_position;
+    std::map<uint32_t, TH1F*> hist_dqm_cluster_global_y_position;
+    std::map<uint32_t, TH2F*> hist_dqm_cluster_global_2d_position;
+    
+    std::map<uint32_t, TH1F*> hist_dqm_n_clusters;
+    std::map<uint32_t, TH1F*> hist_dqm_cluster_charge;
+    std::map<uint32_t, TH1F*> hist_dqm_cluster_size;
+    
+    // Histograms showing correlations per module pair
+    std::map<std::pair<uint32_t, uint32_t>, TH2F*> hist_local_x_correlation;
+    std::map<std::pair<uint32_t, uint32_t>, TH2F*> hist_global_x_correlation;
+    std::map<std::pair<uint32_t, uint32_t>, TH2F*> hist_local_y_correlation;
+    std::map<std::pair<uint32_t, uint32_t>, TH2F*> hist_global_y_correlation;
+    std::map<std::pair<uint32_t, uint32_t>, TH1F*> hist_local_delta_x;
+    std::map<std::pair<uint32_t, uint32_t>, TH1F*> hist_global_delta_x;
+    std::map<std::pair<uint32_t, uint32_t>, TH1F*> hist_local_delta_y;
+    std::map<std::pair<uint32_t, uint32_t>, TH1F*> hist_global_delta_y;
+    std::map<std::pair<uint32_t, uint32_t>, TH2F*> hist_local_delta_x_vs_delta_y;
+    std::map<std::pair<uint32_t, uint32_t>, TH2F*> hist_global_delta_x_vs_delta_y;
+    
+    // Histograms for all modules
+    TH1F* hist_n_digis_tot;
+    TH1F* hist_n_clusters_tot;
+    TH1F* hist_cluster_charge_tot;
+    
+    // Cluster tree
+    TTree* cluster_tree;
+    
+    // Declaration of leaves types
+    Int_t tree_run_number;
+    Int_t tree_lumi_section;
+    Int_t tree_event;
+    Int_t tree_det_id;
+    TString tree_module_name;
+    Int_t tree_n_clusters;
+    Double_t tree_cluster_charge;
+    Int_t tree_cluster_size;
+    Double_t tree_cluster_local_x_position;
+    Double_t tree_cluster_local_y_position;
+    Double_t tree_cluster_global_x_position;
+    Double_t tree_cluster_global_y_position;
+    Double_t tree_cluster_global_z_position;
      
     // information to stored in the output file
-    std::map< uint32_t, TH1F* > DQM_ClusterCharge ;
-    std::map< uint32_t, TH1F* > DQM_ClusterSize_X ;
-    std::map< uint32_t, TH1F* > DQM_ClusterSize_Y ;
-    std::map< uint32_t, TH1F* > DQM_ClusterSize_XY ;
-    std::map< uint32_t, TH1F* > DQM_NumbOfClusters_per_Event;
-    std::map< uint32_t, TH2F* > DQM_ClusterPosition ;
-
-    std::map< uint32_t, TH2F* >  DQM_DigiPosition ;
-    std::map< uint32_t, TH1F* > DQM_NumbOfDigi ;
-
-    TH1F * DQM_NumbOfCluster_Tot ;
-    TH1F * DQM_ClusterCharge_Tot ;
-    TH1F * DQM_NumbOfDigi_Tot ;
+    //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    std::map<uint32_t, TH1F*> DQM_ClusterSize_X ;
+    std::map<uint32_t, TH1F*> DQM_ClusterSize_Y ;
+    std::map<uint32_t, TH1F*> DQM_ClusterSize_XY ;
+   
       
-    edm::EDGetTokenT<edm::DetSetVector<PixelDigi> >         pixeldigiToken_ ;
-    edm::EDGetTokenT<edmNew::DetSetVector<SiPixelCluster> > pixelclusterToken_ ;
-    edm::EDGetTokenT<edmNew::DetSetVector<SiPixelRecHit> >  pixelhitToken_ ;
-      
-
-    // detId versus moduleName and other definitions
-    std::vector<uint32_t > list_of_modules ;
-    std::map<int , TString> detId_to_moduleName ;
-    std::map<TString , int> moduleName_to_detID ;
-    std::map<TString , std::vector<double> > moduleName_to_position ;
-    std::vector<TString> names_of_modules ;
-
-    // Correlation plots for the telescope
-    std::map< std::pair<uint32_t, uint32_t>, TH2F*> DQM_Correlation_X ;
-    std::map< std::pair<uint32_t, uint32_t>, TH2F*> DQM_Correlation_Y ;
-    std::map< std::pair<uint32_t, uint32_t>, TH2F*> DQM_Distance_XY ;
-    std::map< std::pair<uint32_t, uint32_t>, TH2F*> DQM_Distance_XYcm ;
-
-    TTree* cluster3DTree ;
-
-    // Declaration of leaves types
-    Int_t      tree_runNumber ;
-    Int_t      tree_lumiSection ;
-    Int_t      tree_event ;
-    Int_t      tree_detId ;
-    Int_t      tree_cluster ;
-    Double_t   tree_charge ;
-    Int_t      tree_size ;
-    Double_t   tree_x ;
-    Double_t   tree_y ;
-    Double_t   tree_z ;
-    TString    tree_modName;
+     
+    
 
 };
 
@@ -147,221 +176,235 @@ class AnaChromini : public edm::one::EDAnalyzer<edm::one::SharedResources>  {
 
 AnaChromini::AnaChromini(const edm::ParameterSet& iConfig)
  :
-  tracksToken_(consumes<TrackCollection>(iConfig.getUntrackedParameter<edm::InputTag>("tracks")))
+  trackToken_(consumes<TrackCollection>(iConfig.getUntrackedParameter<edm::InputTag>("tracks")))
 
 {
  //now do what ever initialization is needed
  
-
-
-/* Version with Chromini4Modul
-  detId_to_moduleName.insert( std::pair<uint32_t, TString>(344463364, "M3704") ) ;
-  detId_to_moduleName.insert( std::pair<uint32_t, TString>(344724484, "M3672") ) ;
-  detId_to_moduleName.insert( std::pair<uint32_t, TString>(344725508, "M3558") ) ;
-  detId_to_moduleName.insert( std::pair<uint32_t, TString>(344462340, "M3028") ) ;
-  moduleName_to_detID.insert( std::pair<TString, uint32_t>("M3704", 344463364) ) ;
-  moduleName_to_detID.insert( std::pair<TString, uint32_t>("M3672", 344724484) ) ;
-  moduleName_to_detID.insert( std::pair<TString, uint32_t>("M3558", 344725508) ) ;
-  moduleName_to_detID.insert( std::pair<TString, uint32_t>("M3028", 344462340) ) ;
-  list_of_modules.push_back(344463364) ;
-  list_of_modules.push_back(344724484) ; 
-  list_of_modules.push_back(344725508) ; 
-  list_of_modules.push_back(344462340) ; 
-  names_of_modules.push_back("M3704") ;
-  names_of_modules.push_back("M3672") ;
-  names_of_modules.push_back("M3558") ;
-  names_of_modules.push_back("M3028") ;
-*/
-
-/* old version === last one before Cyrce
-  // map for the detId vs Module name:
-  //  fiber 6 (white) = 344463364
-  detId_to_moduleName.insert( std::pair<uint32_t, TString>(344463364, "M3558") ) ;
-  //   fiber 3 (green) = 344462340
-  detId_to_moduleName.insert( std::pair<uint32_t, TString>(344462340, "M3211") ) ;
-  //  fiber 1 (blue) = 344725508
-  detId_to_moduleName.insert( std::pair<uint32_t, TString>(344725508, "M3028") ) ;
-  //  fiber 12 (aqua)  = 344724484
-  detId_to_moduleName.insert( std::pair<uint32_t, TString>(344724484, "M3704") ) ;
-  //  fiber 11 (pink)  = 344987652
-  detId_to_moduleName.insert( std::pair<uint32_t, TString>(344987652, "M4643") ) ;
-  //  fiber 10 (purple)  = 344986628
-  detId_to_moduleName.insert( std::pair<uint32_t, TString>(344986628, "M3672") ) ;
-*/
-
  
-  // Cyrce Design
-  // map for the detId vs Module name:
-  //  fiber 6 (white) = 344463364
-  detId_to_moduleName.insert( std::pair<uint32_t, TString>(344463364, "M3558") ) ;
-  //   fiber 3 (green) = 344462340
-  detId_to_moduleName.insert( std::pair<uint32_t, TString>(344462340, "M4643") ) ;
-  //  fiber 1 (blue) = 344725508
-  detId_to_moduleName.insert( std::pair<uint32_t, TString>(344725508, "M3028") ) ;
-  //  fiber 12 (aqua)  = 344724484
-  detId_to_moduleName.insert( std::pair<uint32_t, TString>(344724484, "M3672") ) ;
-  //  fiber 11 (pink)  = 344987652
-//  detId_to_moduleName.insert( std::pair<uint32_t, TString>(344987652, "M3211") ) ;
-  //  fiber 10 (purple)  = 344986628
-//  detId_to_moduleName.insert( std::pair<uint32_t, TString>(344986628, "M3704") ) ;
-
-/*
-//  
-//  fiber 8 = 344201220
-//  detId_to_moduleName.insert( std::pair<uint32_t, TString>(344201220, "M3704") ) ;
-//  fiber 5 = 344200196
-//  detId_to_moduleName.insert( std::pair<uint32_t, TString>(344200196, "M3704") ) ;
-//  */
-
-/*
-  // Module name to detID
-  // fiber 6 
-  moduleName_to_detID.insert( std::pair<TString, uint32_t>("M3558", 344463364) ) ;
-  //  fiber 3 
-  moduleName_to_detID.insert( std::pair<TString, uint32_t>("M3211", 344462340) ) ;
-  //  fiber 1
-  moduleName_to_detID.insert( std::pair<TString, uint32_t>("M3028", 344725508) ) ;
-  //  fiber 12 
-  moduleName_to_detID.insert( std::pair<TString, uint32_t>("M3704", 344724484) ) ;
-  // fiber 11
-  moduleName_to_detID.insert( std::pair<TString, uint32_t>("M4643", 344987652) ) ;
-  // fiber 10
-  moduleName_to_detID.insert( std::pair<TString, uint32_t>("M3672", 344986628) ) ;
-*/
-
-// Cyrce Design
-  // Module name to detID
-  // fiber 6 
-  moduleName_to_detID.insert( std::pair<TString, uint32_t>("M3558", 344463364) ) ;
-  //  fiber 3 
-  moduleName_to_detID.insert( std::pair<TString, uint32_t>("M4643", 344462340) ) ;
-  //  fiber 1
-  moduleName_to_detID.insert( std::pair<TString, uint32_t>("M3028", 344725508) ) ;
-  //  fiber 12 
-  moduleName_to_detID.insert( std::pair<TString, uint32_t>("M3672", 344724484) ) ;
-  // fiber 11
-//  moduleName_to_detID.insert( std::pair<TString, uint32_t>("M3211", 344987652) ) ;
-  // fiber 10
-//  moduleName_to_detID.insert( std::pair<TString, uint32_t>("M3704", 344986628) ) ;
-
-
-  list_of_modules.push_back(344463364) ;
-  list_of_modules.push_back(344462340) ;
-  list_of_modules.push_back(344725508) ; 
-  list_of_modules.push_back(344724484) ; 
-//  list_of_modules.push_back(344987652) ; 
-//  list_of_modules.push_back(344986628) ; 
-
-  names_of_modules.push_back("M3558") ;
-  names_of_modules.push_back("M4643") ;
-  names_of_modules.push_back("M3028") ;
-  names_of_modules.push_back("M3672") ;
-//  names_of_modules.push_back("M3211") ;
-//  names_of_modules.push_back("M3704") ;
-
-
-
-  TFileDirectory sub1 = fs->mkdir(  "run100000" ); // This does not make sense yet
-
-  cluster3DTree = sub1.make<TTree>("cluster3DTree", "3D Cluster Tree");
-  TFileDirectory sub2 = sub1.mkdir( "dqmPlots" ) ;
-  TFileDirectory sub3 = sub2.mkdir( "runSummary" ) ;
-  TFileDirectory sub4 = sub1.mkdir( "correlationPlots" ) ;  
-
-  // Set branch addresses.
-  cluster3DTree->Branch("runNumber",&tree_runNumber);
-  cluster3DTree->Branch("lumiSection",&tree_lumiSection);
-  cluster3DTree->Branch("event",&tree_event);
-  cluster3DTree->Branch("detId",&tree_detId);
-  cluster3DTree->Branch("modName",&tree_modName);
-  cluster3DTree->Branch("cluster",&tree_cluster);
-  cluster3DTree->Branch("charge",&tree_charge);
-  cluster3DTree->Branch("size",&tree_size);
-  cluster3DTree->Branch("x",&tree_x);
-  cluster3DTree->Branch("y",&tree_y);
-  cluster3DTree->Branch("z",&tree_z);
-
-  //for(unsigned int i=0; i<list_of_modules.size(); i++) modulesNbr_to_idx[list_of_modules[i]] = i;
-
-  for ( std::map<int, TString>::iterator it = detId_to_moduleName.begin(); it != detId_to_moduleName.end(); it++ ) {
-    
-    TString modulename = it -> second ;
-
-    std::vector<TH2F *> tmp_vec_x ; // for the corr plots, hence the extra for loop
-    std::vector<TH2F *> tmp_vec_y ; // for the corr plots, hence the extra for loop
-
-    // Make the correlation plots
-    for ( std::map<int, TString>::iterator jt = it; jt != detId_to_moduleName.end(); jt++ ) { // jt=it to make sure we do not have double plots.
-   
-      TString modulename0 = jt -> second ;
-
-      // inversion with respect to Chromie
-      // in Chromini : Y from 0 to 160 and X from 0 to 416 !
-      TH2F* DQM_Correlation_Y_tmp = sub4.make<TH2F>( ( "DQM_Correlation_Y_" + modulename + "_" + modulename0).Data(), ( "Y-Correlation between " + modulename + " and " + modulename0 ).Data(), 160., 0., 160., 160., 0., 160. ) ;
-      TH2F* DQM_Correlation_X_tmp = sub4.make<TH2F>( ( "DQM_Correlation_X_" + modulename + "_" + modulename0).Data(), ( "X-Correlation between " + modulename + " and " + modulename0 ).Data(), 416., 0., 416., 416., 0., 416. ) ;
-      TH2F* DQM_Distance_XY_tmp = sub4.make<TH2F>( ( "DQM_Distance_XY_" + modulename + "_" + modulename0).Data(), ( "Y distance vs X distance between " + modulename + " and " + modulename0 ).Data(), 100., -50., 50., 100., -50., 50. ) ;
-      TH2F* DQM_Distance_XYcm_tmp = sub4.make<TH2F>( ( "DQM_Distance_XYcm_" + modulename + "_" + modulename0).Data(), ( "Y distance vs X distance between " + modulename + " and " + modulename0 ).Data(), 100., -0.5, 0.5, 100., -0.5, 0.5 ) ;
-
-      DQM_Correlation_X_tmp->GetXaxis()->SetTitle("x_" + modulename) ;
-      DQM_Correlation_X_tmp->GetYaxis()->SetTitle("x_" + modulename0) ;
-      DQM_Correlation_Y_tmp->GetXaxis()->SetTitle("y_" + modulename) ;
-      DQM_Correlation_Y_tmp->GetYaxis()->SetTitle("y_" + modulename0) ;
-      DQM_Distance_XY_tmp->GetXaxis()->SetTitle("x_" + modulename + " - x_" + modulename0) ;
-      DQM_Distance_XY_tmp->GetYaxis()->SetTitle("y_" + modulename + " - y_" + modulename0) ;
-      DQM_Distance_XYcm_tmp->GetXaxis()->SetTitle("x_" + modulename + " - x_" + modulename0) ;
-      DQM_Distance_XYcm_tmp->GetYaxis()->SetTitle("y_" + modulename + " - y_" + modulename0) ;
-
-      std::pair<uint32_t, uint32_t> modulePair = std::make_pair ( it->first, jt->first ) ;
-
-      DQM_Correlation_X.insert ( std::pair < std::pair<uint32_t, uint32_t>, TH2F*>( modulePair, DQM_Correlation_X_tmp ) ) ;
-      DQM_Correlation_Y.insert ( std::pair < std::pair<uint32_t, uint32_t>, TH2F*>( modulePair, DQM_Correlation_Y_tmp ) ) ;
-      DQM_Distance_XY.insert ( std::pair < std::pair<uint32_t, uint32_t>, TH2F*>( modulePair, DQM_Distance_XY_tmp ) ) ;
-      DQM_Distance_XYcm.insert ( std::pair < std::pair<uint32_t, uint32_t>, TH2F*>( modulePair, DQM_Distance_XYcm_tmp ) ) ;
-
-    }//end for j 
-
-    // Make the DQM plots
-    TH1F* DQM_ClusterCharge_tmp = sub3.make<TH1F>( ("DQM_ClusterCharge_"+ modulename).Data(), ("Cluster charge for "+ modulename).Data(), 200, 0., 200000. );
-    TH1F* DQM_ClusterSize_Y_tmp = sub3.make<TH1F>( ("DQM_ClusterSize_Y_"+ modulename).Data(), ("X cluster size for "+ modulename).Data(), 30, 0., 30. );
-    TH1F* DQM_ClusterSize_X_tmp = sub3.make<TH1F>( ("DQM_ClusterSize_X_"+ modulename).Data(), ("Y cluster size for "+ modulename).Data(), 30, 0., 30. );
-    TH1F* DQM_ClusterSize_XY_tmp = sub3.make<TH1F>( ("DQM_ClusterSize_XY_"+ modulename).Data(), ("Cluster Size for "  + modulename).Data(), 30, 0., 30. );
-    TH1F* DQM_NumbOfClusters_per_Event_tmp = sub3.make<TH1F>( ("DQM_NumbOfClusters_per_Event_" + modulename).Data(), ("number of clusters for "  + modulename).Data(), 30, 0., 30. );
-    TH2F* DQM_ClusterPosition_tmp = sub3.make<TH2F>( ("DQM_ClusterPosition_"+ modulename).Data(), ("Cluster occupancy per col per row for "+ modulename).Data(), 416, 0., 416., 160, 0, 160 );
-      
-    DQM_ClusterCharge_tmp->GetXaxis()->SetTitle("Charge (electrons)");
-    DQM_ClusterSize_X_tmp->GetXaxis()->SetTitle("size (pixels)");
-    DQM_ClusterSize_Y_tmp->GetXaxis()->SetTitle("size (pixels)");	
-    DQM_ClusterSize_XY_tmp->GetXaxis()->SetTitle("size (pixels)"); 
-    DQM_ClusterPosition_tmp->GetXaxis()->SetTitle("col"); 
-    DQM_ClusterPosition_tmp->GetYaxis()->SetTitle("row"); 
-    DQM_NumbOfClusters_per_Event_tmp -> GetXaxis ( ) -> SetTitle ( "Number of clusters / event " ) ;
-    DQM_NumbOfClusters_per_Event_tmp -> GetYaxis ( ) -> SetTitle ( "Count" ) ;
-
-    DQM_ClusterCharge.insert ( std::pair< uint32_t, TH1F* >( it->first, DQM_ClusterCharge_tmp ) ) ;
-    DQM_ClusterSize_X.insert ( std::pair< uint32_t, TH1F* >( it->first, DQM_ClusterSize_X_tmp ) ) ;
-    DQM_ClusterSize_Y.insert ( std::pair< uint32_t, TH1F* >( it->first, DQM_ClusterSize_Y_tmp ) ) ;
-    DQM_ClusterSize_XY.insert ( std::pair< uint32_t, TH1F* >( it->first, DQM_ClusterSize_XY_tmp ) ) ;
-    DQM_NumbOfClusters_per_Event.insert ( std::pair< uint32_t, TH1F* >( it->first, DQM_NumbOfClusters_per_Event_tmp ) );
-    DQM_ClusterPosition.insert ( std::pair< uint32_t, TH2F* >( it->first, DQM_ClusterPosition_tmp ) ) ;
-
-      
-    TH2F* DQM_DigiPosition_tmp = sub3.make<TH2F>( ("DQM_DigiPosition_"+ modulename).Data(), ("Digi occupancy per col per row for "+ modulename).Data(),  416,  0., 416., 160, 0, 160	);
-    TH1F* DQM_NumbOfDigi_tmp = sub3.make<TH1F>( ("DQM_NumbOfDigi"+ modulename).Data(),    ("Number of cluster for "  + modulename).Data(), 30,  0., 30. );
+  pixelDigiToken_ = consumes<edm::DetSetVector<PixelDigi>>(iConfig.getParameter<edm::InputTag>("PixelDigisLabel"));
+  pixelHitToken_ = consumes<edmNew::DetSetVector<SiPixelRecHit>>(iConfig.getParameter<edm::InputTag>("PixelHitsLabel"));
+  pixelClusterToken_ = consumes<edmNew::DetSetVector<SiPixelCluster>>(iConfig.getParameter<edm::InputTag>("PixelClustersLabel"));
  
-    DQM_DigiPosition.insert ( std::pair< uint32_t, TH2F* >( it->first, DQM_DigiPosition_tmp)); 
-    DQM_NumbOfDigi.insert ( std::pair< uint32_t, TH1F* >( it->first, DQM_NumbOfDigi_tmp));
-
-    DQM_DigiPosition_tmp->GetXaxis()->SetTitle("col"); 
-    DQM_DigiPosition_tmp->GetYaxis()->SetTitle("row"); 
-
-  }//end for it
+  // CHROMini setup
     
-  DQM_NumbOfDigi_Tot    = sub3.make<TH1F>( "DQM_NumbOfDigi_Tot",    "total number of digi"   , 30,  0., 30.);
-  DQM_NumbOfCluster_Tot = sub3.make<TH1F>( "DQM_NumbOfCluster_Tot", "total number of cluster", 30,  0., 30.);
+  // Det ID to module name
+  // fiber 6
+  det_id_to_module_name.insert(std::pair<uint32_t, TString>(344463364, "M3558"));
+  // fiber 3
+  det_id_to_module_name.insert(std::pair<uint32_t, TString>(344462340, "M4643"));
+  // fiber 1
+  det_id_to_module_name.insert(std::pair<uint32_t, TString>(344725508, "M3028"));
+  // fiber 12
+  det_id_to_module_name.insert(std::pair<uint32_t, TString>(344724484, "M3672"));
   
-  pixeldigiToken_    = consumes<edm::DetSetVector<PixelDigi> >        (iConfig.getParameter<edm::InputTag>("PixelDigisLabel"))   ;
-  pixelclusterToken_ = consumes<edmNew::DetSetVector<SiPixelCluster> >(iConfig.getParameter<edm::InputTag>("PixelClustersLabel"));
-  pixelhitToken_     = consumes<edmNew::DetSetVector<SiPixelRecHit> > (iConfig.getParameter<edm::InputTag>("PixelHitsLabel"))    ;
+  TFileDirectory cluster_dir = fs->mkdir("cluster");
+  cluster_tree = cluster_dir.make<TTree>("cluster_tree", "Cluster tree");
+  
+  // Set branch addresses.
+  cluster_tree->Branch("run_number", &tree_run_number);
+  cluster_tree->Branch("lumi_section", &tree_lumi_section);
+  cluster_tree->Branch("event", &tree_event);
+  cluster_tree->Branch("det_id", &tree_det_id);
+  cluster_tree->Branch("module_name", &tree_module_name);
+  cluster_tree->Branch("n_clusters", &tree_n_clusters);
+  cluster_tree->Branch("cluster_charge", &tree_cluster_charge);
+  cluster_tree->Branch("cluster_size", &tree_cluster_size);
+  cluster_tree->Branch("cluster_local_x", &tree_cluster_local_x_position);
+  cluster_tree->Branch("cluster_local_y", &tree_cluster_local_y_position);
+  cluster_tree->Branch("cluster_global_x", &tree_cluster_global_x_position);
+  cluster_tree->Branch("cluster_global_y", &tree_cluster_global_y_position);
+  cluster_tree->Branch("cluster_global_z", &tree_cluster_global_z_position);
+  
+  TFileDirectory dqm_dir = fs->mkdir("dqm");
+  TFileDirectory correlation_dir = fs->mkdir("correlation");
+  TFileDirectory run_dir = fs->mkdir("run_summary");
+  
+  // inversion with respect to Chromie
+  // in Chromini : Y from 0 to 160 and X from 0 to 416 !
+  int n_columns = 416;
+  int n_rows = 160;
+  
+  int n_x_bins = 200;
+  float min_x = -1.5;
+  float max_x = 1.5;
+  
+  int n_y_bins = 100;
+  float min_y = -0.5;
+  float max_y = 1.0;
+  
+  int n_delta_x_bins = 100;
+  int min_delta_x = -50;
+  int max_delta_x = 50;
+  //float min_delta_x_in_cm = -0.5;
+  //float max_delta_x_in_cm = 0.5;
+  
+  int n_delta_y_bins = 100;
+  int min_delta_y = -50;
+  int max_delta_y = 50;
+  //float min_delta_y_in_cm = -0.5;
+  //float max_delta_y_in_cm = 0.5;
+  
+  int n_digis_bins = 20;
+  int n_clusters_bins = 5;
+  
+  for (auto iter=det_id_to_module_name.begin(); iter!=det_id_to_module_name.end(); iter++)
+  {
+  	// Access key
+    	auto imodule_det_id = iter->first;
+	// Access value
+	auto imodule_name = iter->second;
+	
+	module_det_ids.push_back(imodule_det_id);
+	module_names.push_back(imodule_name);
+	module_name_to_det_id.insert(std::pair<TString, uint32_t>(imodule_name, imodule_det_id));
+	
+	// DQM plots
+	
+	TH1F* tmp_hist_dqm_digi_column_position = dqm_dir.make<TH1F>(("digi_column_position_"+ imodule_name).Data(), ("Digi Column for "+imodule_name).Data(),n_columns , -0.5, n_columns-0.5);
+	TH1F* tmp_hist_dqm_digi_row_position = dqm_dir.make<TH1F>(("digi_row_position_"+ imodule_name).Data(), ("Digi Row for "+imodule_name).Data(),n_rows , -0.5, n_rows-0.5);
+	TH2F* tmp_hist_dqm_digi_2d_position = dqm_dir.make<TH2F>(("digi_2d_position_"+ imodule_name).Data(), ("Digi 2D position for "+imodule_name).Data(), n_columns, -0.5, n_columns-0.5, n_rows, -0.5, n_rows-0.5);
+	TH1F* tmp_hist_dqm_n_digis = dqm_dir.make<TH1F>(("n_digis_"+ imodule_name).Data(), ("Number of digis for "+imodule_name).Data(),n_digis_bins , -0.5, n_digis_bins-0.5);
+	
+	TH1F* tmp_hist_dqm_cluster_local_x_position = dqm_dir.make<TH1F>(("cluster_local_x_position_"+imodule_name).Data(), ("Cluster X_{"+imodule_name+"} [local unity]").Data(),n_columns , -0.5, n_columns-0.5);
+	TH1F* tmp_hist_dqm_cluster_local_y_position = dqm_dir.make<TH1F>(("cluster_local_y_position_"+imodule_name).Data(), ("Cluster Y_{"+imodule_name+"} [local unity]").Data(),n_rows , -0.5, n_rows-0.5);
+	TH2F* tmp_hist_dqm_cluster_local_2d_position = dqm_dir.make<TH2F>(("cluster_local_2d_position_"+imodule_name).Data(), ("Cluster 2D position for "+imodule_name+" [local unity]").Data(), n_columns, -0.5, n_columns-0.5, n_rows, -0.5, n_rows-0.5);
+	
+	TH1F* tmp_hist_dqm_cluster_global_x_position = dqm_dir.make<TH1F>(("cluster_global_x_position_"+imodule_name).Data(), ("Cluster X_{"+imodule_name+"} [cm]").Data(),n_x_bins , min_x, max_x);
+	TH1F* tmp_hist_dqm_cluster_global_y_position = dqm_dir.make<TH1F>(("cluster_global_y_position_"+imodule_name).Data(), ("Cluster Y_{"+imodule_name+"} [cm]").Data(),n_y_bins , min_y, max_y);
+	TH2F* tmp_hist_dqm_cluster_global_2d_position = dqm_dir.make<TH2F>(("cluster_global_2d_position_"+imodule_name).Data(), ("Cluster 2D position for "+imodule_name+" [cm]").Data(), n_x_bins, min_x, max_x, n_y_bins, min_y, max_y);
+	
+	
+	TH1F* tmp_hist_dqm_n_clusters = dqm_dir.make<TH1F>(("n_clusters_"+ imodule_name).Data(), ("Number of clusters for "+imodule_name).Data(),n_clusters_bins , -0.5, n_clusters_bins-0.5);
+	TH1F* tmp_hist_dqm_cluster_charge = dqm_dir.make<TH1F>(("cluster_charge_"+ imodule_name).Data(), ("Cluster charge for "+imodule_name).Data(),100 , 0, 1000);
+	TH1F* tmp_hist_dqm_cluster_size = dqm_dir.make<TH1F>(("cluster_size_"+ imodule_name).Data(), ("Size of clusters for "+imodule_name).Data(),n_clusters_bins , -0.5, n_clusters_bins-0.5);
+	
+	
+	tmp_hist_dqm_digi_column_position->GetXaxis()->SetTitle("Column Number for "+imodule_name);
+	tmp_hist_dqm_digi_row_position->GetXaxis()->SetTitle("Row Number for "+imodule_name);
+	
+	tmp_hist_dqm_digi_2d_position->GetXaxis()->SetTitle("Column Number for "+imodule_name);
+      	tmp_hist_dqm_digi_2d_position->GetYaxis()->SetTitle("Row Number for "+imodule_name);
+	
+	tmp_hist_dqm_cluster_local_x_position->GetXaxis()->SetTitle("X_{"+imodule_name+"} [local unity]");
+	tmp_hist_dqm_cluster_local_y_position->GetXaxis()->SetTitle("Y_{"+imodule_name+"} [local unity]");
+	
+	tmp_hist_dqm_cluster_local_2d_position->GetXaxis()->SetTitle("X_{"+imodule_name+"} [local unity]");
+      	tmp_hist_dqm_cluster_local_2d_position->GetYaxis()->SetTitle("Y_{"+imodule_name+"} [local unity]");
+	
+	tmp_hist_dqm_cluster_global_x_position->GetXaxis()->SetTitle("X_{"+imodule_name+"} [cm]");
+	tmp_hist_dqm_cluster_global_y_position->GetXaxis()->SetTitle("Y_{"+imodule_name+"} [cm]");
+	
+	tmp_hist_dqm_cluster_global_2d_position->GetXaxis()->SetTitle("X_{"+imodule_name+"} [cm]");
+      	tmp_hist_dqm_cluster_global_2d_position->GetYaxis()->SetTitle("Y_{"+imodule_name+"} [cm]");
+	
+	tmp_hist_dqm_cluster_charge->GetXaxis()->SetTitle("Cluster charge [electrons]");
+	tmp_hist_dqm_cluster_size->GetXaxis()->SetTitle("Cluster size [pixels]");
+      
+    	
+	hist_dqm_digi_column_position.insert(std::pair<uint32_t, TH1F*>(imodule_det_id, tmp_hist_dqm_digi_column_position));
+    	hist_dqm_digi_row_position.insert(std::pair<uint32_t, TH1F*>(imodule_det_id, tmp_hist_dqm_digi_row_position));
+    	hist_dqm_digi_2d_position.insert(std::pair<uint32_t, TH2F*>(imodule_det_id, tmp_hist_dqm_digi_2d_position));
+    	hist_dqm_n_digis.insert(std::pair<uint32_t, TH1F*>(imodule_det_id, tmp_hist_dqm_n_digis));
+    
+    	hist_dqm_cluster_local_x_position.insert(std::pair<uint32_t, TH1F*>(imodule_det_id, tmp_hist_dqm_cluster_local_x_position));
+    	hist_dqm_cluster_local_y_position.insert(std::pair<uint32_t, TH1F*>(imodule_det_id, tmp_hist_dqm_cluster_local_y_position));
+    	hist_dqm_cluster_local_2d_position.insert(std::pair<uint32_t, TH2F*>(imodule_det_id, tmp_hist_dqm_cluster_local_2d_position));
+	
+	hist_dqm_cluster_global_x_position.insert(std::pair<uint32_t, TH1F*>(imodule_det_id, tmp_hist_dqm_cluster_global_x_position));
+    	hist_dqm_cluster_global_y_position.insert(std::pair<uint32_t, TH1F*>(imodule_det_id, tmp_hist_dqm_cluster_global_y_position));
+    	hist_dqm_cluster_global_2d_position.insert(std::pair<uint32_t, TH2F*>(imodule_det_id, tmp_hist_dqm_cluster_global_2d_position));
+	
+	
+    	hist_dqm_n_clusters.insert(std::pair<uint32_t, TH1F*>(imodule_det_id, tmp_hist_dqm_n_clusters));
+    	hist_dqm_cluster_charge.insert(std::pair<uint32_t, TH1F*>(imodule_det_id, tmp_hist_dqm_cluster_charge));
+    	hist_dqm_cluster_size.insert(std::pair<uint32_t, TH1F*>(imodule_det_id, tmp_hist_dqm_cluster_size));
+	
+	
+	for (auto jter=det_id_to_module_name.begin(); jter!=det_id_to_module_name.end(); jter++)
+	{
+	    // Access key
+    	    auto jmodule_det_id = jter->first;
+	    // Access value
+	    auto jmodule_name = jter->second;
+		
+	    if (imodule_det_id != jmodule_det_id)
+	    {
+    
+    		TH2F* tmp_hist_local_x_correlation = correlation_dir.make<TH2F>(("local_x_correlation_"+imodule_name+"_"+jmodule_name).Data(), ("X correlation between "+imodule_name+" and "+ jmodule_name+" [local unity]").Data(), n_columns, -0.5, n_columns-0.5, n_columns, -0.5, n_columns-0.5);
+    
+		TH2F* tmp_hist_local_y_correlation = correlation_dir.make<TH2F>(("local_y_correlation_"+imodule_name+"_"+jmodule_name).Data(), ("Y correlation between "+imodule_name+" and "+ jmodule_name+" [local unity]").Data(), n_rows, -0.5, n_rows-0.5, n_rows, -0.5, n_rows-0.5);
+		
+		TH1F* tmp_hist_local_delta_x = correlation_dir.make<TH1F>(("local_delta_x_"+imodule_name+"_"+jmodule_name).Data(), ("#Delta X between "+imodule_name+" and "+ jmodule_name+" [local unity]").Data(), n_delta_x_bins, min_delta_x, max_delta_x);
+    
+		TH1F* tmp_hist_local_delta_y = correlation_dir.make<TH1F>(("local_delta_y_"+imodule_name+"_"+jmodule_name).Data(), ("#Delta Y between "+imodule_name+" and "+ jmodule_name+" [local unity]").Data(), n_delta_y_bins, min_delta_y, max_delta_y);
+		
+		TH2F* tmp_hist_local_delta_x_vs_delta_y = correlation_dir.make<TH2F>(("local_delta_x_vs_delta_y_"+imodule_name+"_"+jmodule_name).Data(), ("#Delta X vs #Delta Y between "+imodule_name+" and "+ jmodule_name+" [local unity]").Data(), n_delta_x_bins, min_delta_x, max_delta_x, n_delta_y_bins, min_delta_y, max_delta_y);
+		
+		
+		TH2F* tmp_hist_global_x_correlation = correlation_dir.make<TH2F>(("global_x_correlation_"+imodule_name+"_"+jmodule_name).Data(), ("X correlation between "+imodule_name+" and "+ jmodule_name+" [cm]").Data(), n_x_bins, min_x, max_x, n_x_bins, min_x, max_x);
+    
+		TH2F* tmp_hist_global_y_correlation = correlation_dir.make<TH2F>(("global_y_correlation_"+imodule_name+"_"+jmodule_name).Data(), ("Y correlation between "+imodule_name+" and "+ jmodule_name+" [cm]").Data(), n_y_bins, min_y, max_y, n_y_bins, min_y, max_y);
+		
+		TH1F* tmp_hist_global_delta_x = correlation_dir.make<TH1F>(("global_delta_x_"+imodule_name+"_"+jmodule_name).Data(), ("#Delta X between "+imodule_name+" and "+ jmodule_name+" [cm]").Data(), 100, -1, 1);
+    
+		TH1F* tmp_hist_global_delta_y = correlation_dir.make<TH1F>(("global_delta_y_"+imodule_name+"_"+jmodule_name).Data(), ("#Delta Y between "+imodule_name+" and "+ jmodule_name+" [cm]").Data(), 100, -1, 1);
+		
+		TH2F* tmp_hist_global_delta_x_vs_delta_y = correlation_dir.make<TH2F>(("global_delta_x_vs_delta_y_"+imodule_name+"_"+jmodule_name).Data(), ("#Delta X vs #Delta Y between "+imodule_name+" and "+ jmodule_name+" [cm]").Data(), 100, -1, 1, 100, -1, 1);
+		
+		
+		tmp_hist_local_x_correlation->GetXaxis()->SetTitle("X_{"+imodule_name+"} [local unity]");
+		tmp_hist_local_x_correlation->GetYaxis()->SetTitle("X_{"+jmodule_name+"} [local unity]");
+		
+		tmp_hist_global_x_correlation->GetXaxis()->SetTitle("X_{"+imodule_name+"} [cm]");
+		tmp_hist_global_x_correlation->GetYaxis()->SetTitle("X_{"+jmodule_name+"} [cm]");
+		
+		tmp_hist_local_y_correlation->GetXaxis()->SetTitle("Y_{"+imodule_name+"} [local unity]");
+		tmp_hist_local_y_correlation->GetYaxis()->SetTitle("Y_{"+jmodule_name+"} [local unity]");
+		
+		tmp_hist_global_y_correlation->GetXaxis()->SetTitle("Y_{"+imodule_name+"} [cm]");
+		tmp_hist_global_y_correlation->GetYaxis()->SetTitle("Y_{"+jmodule_name+"} [cm]");
+		
+		tmp_hist_local_delta_x->GetXaxis()->SetTitle("X_{"+imodule_name+"} - X_{"+jmodule_name+"} [local unity]");
+		tmp_hist_global_delta_x->GetXaxis()->SetTitle("X_{"+imodule_name+"} - X_{"+jmodule_name+"} [cm]");
+		
+		tmp_hist_local_delta_y->GetXaxis()->SetTitle("Y_{"+imodule_name+"} - Y_{"+jmodule_name+"} [local unity]");
+		tmp_hist_global_delta_y->GetXaxis()->SetTitle("Y_{"+imodule_name+"} - Y_{"+jmodule_name+"} [cm]");
+		
+		tmp_hist_local_delta_x_vs_delta_y->GetXaxis()->SetTitle("X_{"+imodule_name+"} - X_{"+jmodule_name+"} [local unity]");
+		tmp_hist_local_delta_x_vs_delta_y->GetYaxis()->SetTitle("Y_{"+imodule_name+"} - Y_{"+jmodule_name+"} [local unity]" );
+		
+		tmp_hist_global_delta_x_vs_delta_y->GetXaxis()->SetTitle("X_{"+imodule_name+"} - X_{"+jmodule_name+"} [cm]");
+		tmp_hist_global_delta_x_vs_delta_y->GetYaxis()->SetTitle("Y_{"+imodule_name+"} - Y_{"+jmodule_name+"} [cm]");
+		
+      
+      		std::pair<uint32_t, uint32_t> module_pair = std::make_pair(imodule_det_id, jmodule_det_id);
+
+      		hist_local_x_correlation.insert(std::pair<std::pair<uint32_t, uint32_t>, TH2F*>(module_pair, tmp_hist_local_x_correlation));
+		hist_global_x_correlation.insert(std::pair<std::pair<uint32_t, uint32_t>, TH2F*>(module_pair, tmp_hist_global_x_correlation));
+		
+      		hist_local_y_correlation.insert(std::pair<std::pair<uint32_t, uint32_t>, TH2F*>(module_pair, tmp_hist_local_y_correlation));
+		hist_global_y_correlation.insert(std::pair<std::pair<uint32_t, uint32_t>, TH2F*>(module_pair, tmp_hist_global_y_correlation));
+      		
+		hist_local_delta_x.insert(std::pair<std::pair<uint32_t, uint32_t>, TH1F*>(module_pair, tmp_hist_local_delta_x));
+		hist_global_delta_x.insert(std::pair<std::pair<uint32_t, uint32_t>, TH1F*>(module_pair, tmp_hist_global_delta_x));
+		
+      		hist_local_delta_y.insert(std::pair<std::pair<uint32_t, uint32_t>, TH1F*>(module_pair,  tmp_hist_local_delta_y));
+		hist_global_delta_y.insert(std::pair<std::pair<uint32_t, uint32_t>, TH1F*>(module_pair,  tmp_hist_global_delta_y));
+		
+      		hist_local_delta_x_vs_delta_y.insert(std::pair<std::pair<uint32_t, uint32_t>, TH2F*>(module_pair, tmp_hist_local_delta_x_vs_delta_y));
+      		hist_global_delta_x_vs_delta_y.insert(std::pair<std::pair<uint32_t, uint32_t>, TH2F*>(module_pair, tmp_hist_global_delta_x_vs_delta_y));
+	
+	
+	    }
+	}
+    
+  }
+  
+  hist_n_digis_tot = run_dir.make<TH1F>("hist_n_digis_tot", "Total number of digis", 30,  0., 30.);
+  hist_n_clusters_tot = run_dir.make<TH1F>("hist_n_clusters_tot", "Total number of clusters", 10,  -0.5, 9.5);
+  hist_cluster_charge_tot = run_dir.make<TH1F>("hist_cluster_charge_tot", "Total cluster charge", 30,  0., 30.);
+    
    
 }//end AnaChromini()
 
@@ -383,26 +426,26 @@ AnaChromini::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 {
   using namespace edm;
    
-  EventID myEvId = iEvent.id();
+  EventID event_id = iEvent.id();
    
-  //get collection of digi
-  edm::Handle<edm::DetSetVector<PixelDigi> > pixeldigis;
-  iEvent.getByToken(pixeldigiToken_,pixeldigis  );
+  //get collection of digis
+  edm::Handle<edm::DetSetVector<PixelDigi>> pixelDigis;
+  iEvent.getByToken(pixelDigiToken_, pixelDigis);
   
-  //get collection of cluster
-  edm::Handle<edmNew::DetSetVector<SiPixelCluster> > pixelclusters;
-  iEvent.getByToken(pixelclusterToken_,pixelclusters  );
+  //get collection of clusters
+  edm::Handle<edmNew::DetSetVector<SiPixelCluster>> pixelClusters;
+  iEvent.getByToken(pixelClusterToken_, pixelClusters);
  
   //get collection or RecHits
-  edm::Handle< edmNew::DetSetVector<SiPixelRecHit> > pixelhits;
-  iEvent.getByToken(pixelhitToken_,pixelhits  );
+  edm::Handle< edmNew::DetSetVector<SiPixelRecHit>> pixelHits;
+  iEvent.getByToken(pixelHitToken_, pixelHits);
 
   // Get the geometry of the tracker for converting the LocalPoint to a GlobalPoint
   edm::ESHandle<TrackerGeometry> tracker;
   iSetup.get<TrackerDigiGeometryRecord>().get(tracker);
-  const TrackerGeometry *tkgeom = &(*tracker); 
+  const TrackerGeometry *tk_geom = &(*tracker); 
   
-  // // Choose the CPE Estimator that will be used to estimate the LocalPoint of the cluster
+  // // Choose the CP Estimator that will be used to estimate the LocalPoint of the cluster
   edm::ESHandle<PixelClusterParameterEstimator> cpEstimator;
   iSetup.get<TkPixelCPERecord>().get("PixelCPEGeneric", cpEstimator);
   const PixelClusterParameterEstimator &cpe(*cpEstimator); 
@@ -411,246 +454,243 @@ AnaChromini::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
   //loop on digis
   //---------------------------------
   
-  //define iterations (in a map) to count the number of cluster per module in the event
-  std::map<int, int> numberofDigi_per_module;  
-  int numberofDigi_total = 0;
-  for ( std::map<int, TString>::iterator it = detId_to_moduleName.begin(); it != detId_to_moduleName.end(); it++ ) numberofDigi_per_module.insert( std::pair< int, int >( it->first, 0 ) ) ;;
+  //define iterations (in a map) to count the number of digi per module in the event
+  std::map<int, int> n_digis_per_module;  
+  int n_digis_total = 0;
   
-  for( edm::DetSetVector<PixelDigi>::const_iterator DSViter=pixeldigis->begin(); DSViter!=pixeldigis->end(); DSViter++   ) {
+  for (std::map<int, TString>::iterator iter=det_id_to_module_name.begin(); iter!=det_id_to_module_name.end(); iter++) n_digis_per_module.insert(std::pair<int, int>(iter->first, 0));
+  
+  for(edm::DetSetVector<PixelDigi>::const_iterator iDSV=pixelDigis->begin(); iDSV!=pixelDigis->end(); iDSV++) 
+  {
       
-    edm::DetSet<PixelDigi>::const_iterator begin=DSViter->begin();
-    edm::DetSet<PixelDigi>::const_iterator end  =DSViter->end();
+    edm::DetSet<PixelDigi>::const_iterator DS_begin = iDSV->begin();
+    edm::DetSet<PixelDigi>::const_iterator DS_end = iDSV->end();
       
-    auto id = DetId(DSViter->detId());
-//    if (myEvId.event()==1 || myEvId.event()==1000) {
-        bool trouve=0;
-        for (unsigned int jj=0; jj<list_of_modules.size(); jj++) {
-              if ((uint32_t) id==list_of_modules[jj]) trouve=1;
-        }
-      if (trouve==0)
-        std::cout << " DetId " << (int) id << std::endl;
-//    }
-      
-    for(edm::DetSet<PixelDigi>::const_iterator iter=begin;iter!=end;++iter) {
+    auto id = DetId(iDSV->detId());
+    
+    for(edm::DetSet<PixelDigi>::const_iterator idigi=DS_begin; idigi!=DS_end; ++idigi) {
          
 	
-      float x = iter->column(); // barycenter x position
-      float y = iter->row();    // barycenter y position
+      float column = idigi->column(); // column
+      float row = idigi->row(); // row
 
       // Apply Mask
-      if ((uint32_t) id==344724484 && y>=80 && 312<= x && x<364) continue;
+      uint32_t det_id = id.rawId();
+      if (det_id==344724484 && row>=80 && 312<=column && column<364) continue;
       
-      DQM_DigiPosition[ id.rawId() ] -> Fill ( x, y ) ;
-      numberofDigi_per_module[ id.rawId() ]++ ;
-
-//      const DetId& detaidi=DSViter->detId();
-//      const PixelDigi* digiprov = iter;
-//        int       pseudo_roc_num = uint64_t(1<<16) * id.rawId() + (1<<8) * (y/80) + x/52;
-//      std::cout << "  Test Digi Position " << id.rawId()  << " x  "   << x  <<   "  y "  << y << "    ROC "  << pseudo_roc_num << std::endl;
-//SiPixelCoordinates::roc(detaidi, digiprov) << std::endl;
-
-      numberofDigi_total++;
-
-//      if (numberofDigi_per_module[ id.rawId()]>0) std::cout << "Digi in " << int(id.rawId()) << " =  " <<  detId_to_moduleName[int(id.rawId())] << std::endl;
-
+      hist_dqm_digi_column_position[det_id]->Fill(column);
+      hist_dqm_digi_row_position[det_id]->Fill(row);
+      hist_dqm_digi_2d_position[det_id]->Fill(column, row);
+      
+      n_digis_per_module[det_id]++;
+      n_digis_total++;
+      
     }//end for DetSet
   }//end for DetSetVector
 
-  DQM_NumbOfDigi_Tot->Fill(numberofDigi_total);
+  hist_n_digis_tot->Fill(n_digis_total);
   
   //fill the number of cluster in the event per module
-  for ( std::map<int, int>::iterator it = numberofDigi_per_module.begin(); it != numberofDigi_per_module.end(); it++ ) DQM_NumbOfDigi[ it->first ] -> Fill ( it->second ) ;
+  for (std::map<int, int>::iterator iter=n_digis_per_module.begin(); iter!=n_digis_per_module.end(); iter++) hist_dqm_n_digis[iter->first]->Fill(iter->second);
   
   //---------------------------------
   //loop on clusters
   //---------------------------------
-  unsigned int numberOfClusters = 0;
   
-  //define iterations (in a map) to count the number of cluster per module in the event
-  std::map<int, int> numberofCluster_per_module; 
-  int numberofCulster_total = 0; 
-  for(unsigned int i=0; i<list_of_modules.size(); i++) numberofCluster_per_module[ list_of_modules[i] ] = 0;
+  for(edmNew::DetSetVector<SiPixelCluster>::const_iterator iDSV=pixelClusters->begin(); iDSV!=pixelClusters->end(); iDSV++) 
+  {
 
+    edmNew::DetSet<SiPixelCluster>::const_iterator iDS_begin = iDSV->begin();
+    edmNew::DetSet<SiPixelCluster>::const_iterator iDS_end = iDSV->end();
 
-//
-//
- for( edmNew::DetSetVector<SiPixelCluster>::const_iterator DSViter=pixelclusters->begin(); DSViter!=pixelclusters->end();DSViter++   ) {
+    auto id_1 = DetId(iDSV->detId());
+    
+    const PixelGeomDetUnit *pixel_geom_1 = (const PixelGeomDetUnit*) tk_geom->idToDetUnit(id_1);
+    LocalPoint local_point_1(-9999., -9999., -9999.);
 
-    edmNew::DetSet<SiPixelCluster>::const_iterator begin=DSViter->begin();
-    edmNew::DetSet<SiPixelCluster>::const_iterator end  =DSViter->end();
+    for(edmNew::DetSetVector<SiPixelCluster>::const_iterator jDSV=pixelClusters->begin(); jDSV!=pixelClusters->end(); jDSV++) 
+    {
 
-    auto id = DetId(DSViter->detId());
-    const PixelGeomDetUnit *pixdet1 = (const PixelGeomDetUnit*) tkgeom->idToDetUnit(id);
-    LocalPoint lp1(-9999., -9999., -9999.);
+      edmNew::DetSet<SiPixelCluster>::const_iterator jDS_begin = jDSV->begin();
+      edmNew::DetSet<SiPixelCluster>::const_iterator jDS_end = jDSV->end();
 
-    for( edmNew::DetSetVector<SiPixelCluster>::const_iterator DSViter2=pixelclusters->begin(); DSViter2!=pixelclusters->end();DSViter2++   ) {
+      auto id_2 = DetId(jDSV->detId());
+      const PixelGeomDetUnit *pixel_geom_2 = (const PixelGeomDetUnit*) tk_geom->idToDetUnit(id_2);
+      LocalPoint local_point_2(-9999., -9999., -9999.);
 
-      edmNew::DetSet<SiPixelCluster>::const_iterator begin2=DSViter2->begin();
-      edmNew::DetSet<SiPixelCluster>::const_iterator end2  =DSViter2->end();
-
-      auto id2 = DetId(DSViter2->detId());
-      const PixelGeomDetUnit *pixdet2 = (const PixelGeomDetUnit*) tkgeom->idToDetUnit(id2);
-      LocalPoint lp2(-9999., -9999., -9999.);
-
-       for(edmNew::DetSet<SiPixelCluster>::const_iterator iter=begin;iter!=end;++iter) {
-        float x = iter->x();                   // barycenter x position for Chromie, y for Chromini
-        float y = iter->y();                   // barycenter y position for Chromie, x for Chromini
-        int row = x , col = y ;
+       for(edmNew::DetSet<SiPixelCluster>::const_iterator icluster=iDS_begin; icluster!=iDS_end; ++icluster) 
+       {
+        // Inverse x-y coordinates for CHROMini
+       	float local_y_1 = icluster->x(); // barycenter x position for Chromie, y for Chromini
+        float local_x_1 = icluster->y(); // barycenter y position for Chromie, x for Chromini
+        //float row_1 = x_1 , col_1 = y_1;
 
         // Apply MASK
-        if ((uint32_t) id==344724484 && x>=80 && 312<= y && y<364) continue;
+        //if ((uint32_t) id_1==344724484 && local_x_1>=80 && 312<=local_y_1 && local_y_1<364) continue;
+	if ((uint32_t) id_1==344724484 && local_y_1>=80 && 312<=local_x_1 && local_x_1<364) continue; // inverse x-y
 
 
-        PixelClusterParameterEstimator::ReturnType params1 = cpe.getParameters(*iter,*pixdet1);
-        lp1 = std::get<0>(params1);
-        const Surface& surface1 = tracker->idToDet(id)->surface();
-        GlobalPoint gp1 = surface1.toGlobal(lp1);
-        float xgb1 = gp1.x();
-        float ygb1 = gp1.y();
+        PixelClusterParameterEstimator::ReturnType parameters_1 = cpe.getParameters(*icluster, *pixel_geom_1);
+        local_point_1 = std::get<0>(parameters_1);
+        const Surface& surface_1 = tracker->idToDet(id_1)->surface();
+        GlobalPoint global_point_1 = surface_1.toGlobal(local_point_1);
+        float global_x_1 = global_point_1.x();
+        float global_y_1 = global_point_1.y();
 
-        for(edmNew::DetSet<SiPixelCluster>::const_iterator iter2=begin2;iter2!=end2;++iter2) {
-
-          float x2 = iter2->x();                   // barycenter x position for Chromie, y for Chromini
-          float y2 = iter2->y();                   // barycenter y position for Chromie, x for Chromini
-          int row2 = x2, col2 = y2 ;
+        for(edmNew::DetSet<SiPixelCluster>::const_iterator jcluster=jDS_begin; jcluster!=jDS_end; ++jcluster) 
+	{
+	  // Inverse x-y coordinates for CHROMini
+          float local_y_2 = jcluster->x(); // barycenter x position for Chromie, y for Chromini
+          float local_x_2 = jcluster->y(); // barycenter y position for Chromie, x for Chromini
+          //float row_2 = x_2, col_2 = y_2;
 
           // Apply MASK
-          if ((uint32_t) id2==344724484 && x2>=80 && 312<= y2 && y2<364) continue;
+          //if ((uint32_t) id_2==344724484 && local_x_2>=80 && 312<=local_y_2 && local_y_2<364) continue;
+	  if ((uint32_t) id_2==344724484 && local_y_2>=80 && 312<=local_x_2 && local_x_2<364) continue; // inverse x-y
 	  
-          std::pair<uint32_t, uint32_t> modulePair = std::make_pair ( id.rawId(), id2.rawId() ) ;
+          std::pair<uint32_t, uint32_t> module_pair = std::make_pair(id_1.rawId(), id_2.rawId());
 
-          bool test_roc_malade=false;
-/*
-          if (((uint32_t) id==344724484 && (uint32_t) id2==344462340)||((uint32_t) id2==344724484 && (uint32_t) id==344462340) ) { //3672 - 4643
-               if ((uint32_t) id==344462340 && x<80 && 208 <= y && y< 260) test_roc_malade=true;
-               if ((uint32_t) id2==344462340 && x2<80 && 208 <= y2 && y2< 260) test_roc_malade=true;
-          }
-*/
+  
+          PixelClusterParameterEstimator::ReturnType parameters_2 = cpe.getParameters(*jcluster,*pixel_geom_2);
+          local_point_2 = std::get<0>(parameters_2);
+          const Surface& surface_2 = tracker->idToDet(id_2)->surface();
+          GlobalPoint global_point_2 = surface_2.toGlobal(local_point_2);
+          float global_x_2 = global_point_2.x();
+          float global_y_2 = global_point_2.y();
 
-          PixelClusterParameterEstimator::ReturnType params2 = cpe.getParameters(*iter2,*pixdet2);
-          lp2 = std::get<0>(params2);
-          const Surface& surface2 = tracker->idToDet(id2)->surface();
-          GlobalPoint gp2 = surface2.toGlobal(lp2);
-          float xgb2 = gp2.x();
-          float ygb2 = gp2.y();
+	  auto hist_map_local_x_correlation = hist_local_x_correlation.find(module_pair);
+	  if (hist_map_local_x_correlation == hist_local_x_correlation.end()) continue;
+	  hist_map_local_x_correlation->second->Fill(local_x_1,local_x_2);
+	  
+	  auto hist_map_local_y_correlation = hist_local_y_correlation.find(module_pair);
+	  if (hist_map_local_y_correlation == hist_local_y_correlation.end()) continue;
+	  hist_map_local_y_correlation->second->Fill(local_y_1,local_y_2);
+	  
+	  auto hist_map_local_delta_x = hist_local_delta_x.find(module_pair);
+	  if (hist_map_local_delta_x == hist_local_delta_x.end()) continue;
+	  hist_map_local_delta_x->second->Fill(local_x_1 - local_x_2);
+	  
+	  auto hist_map_local_delta_y = hist_local_delta_y.find(module_pair);
+	  if (hist_map_local_delta_y == hist_local_delta_y.end()) continue;
+	  hist_map_local_delta_y->second->Fill(local_y_1 - local_y_2);
+	  
+	  auto hist_map_local_delta_x_vs_delta_y = hist_local_delta_x_vs_delta_y.find(module_pair);
+	  if (hist_map_local_delta_x_vs_delta_y == hist_local_delta_x_vs_delta_y.end()) continue;
+	  hist_map_local_delta_x_vs_delta_y->second->Fill(local_x_1 - local_x_2, local_y_1 - local_y_2);
+	  
+	  auto hist_map_global_x_correlation = hist_global_x_correlation.find(module_pair);
+	  if (hist_map_global_x_correlation == hist_global_x_correlation.end()) continue;
+	  hist_map_global_x_correlation->second->Fill(global_x_1,global_x_2);
+	  
+	  auto hist_map_global_y_correlation = hist_global_y_correlation.find(module_pair);
+	  if (hist_map_global_y_correlation == hist_global_y_correlation.end()) continue;
+	  hist_map_global_y_correlation->second->Fill(global_y_1,global_y_2);
+	  
+	  auto hist_map_global_delta_x = hist_global_delta_x.find(module_pair);
+	  if (hist_map_global_delta_x == hist_global_delta_x.end()) continue;
+	  hist_map_global_delta_x->second->Fill(global_x_1 - global_x_2);
+	  
+	  auto hist_map_global_delta_y = hist_global_delta_y.find(module_pair);
+	  if (hist_map_global_delta_y == hist_global_delta_y.end()) continue;
+	  hist_map_global_delta_y->second->Fill(global_y_1 - global_y_2);
+	  
+	  auto hist_map_global_delta_x_vs_delta_y = hist_global_delta_x_vs_delta_y.find(module_pair);
+	  if (hist_map_global_delta_x_vs_delta_y == hist_global_delta_x_vs_delta_y.end()) continue;
+	  hist_map_global_delta_x_vs_delta_y->second->Fill(global_x_1 - global_x_2, global_y_1 - global_y_2);
 
-          auto itHistMap = DQM_Correlation_Y.find(modulePair);
-	        
-          if ( itHistMap == DQM_Correlation_Y.end() ) continue;
-          if(!test_roc_malade) itHistMap->second->Fill ( row, row2 ) ;
+        }//end for jcluster
+      }//end for icluster
+    }//end for first jdet
+  }//end for first idet
 
-          auto itHistMap2 = DQM_Correlation_X.find(modulePair);
-          if ( itHistMap2 == DQM_Correlation_X.end() ) continue;
-          if(!test_roc_malade) itHistMap2->second->Fill ( col, col2 ) ;
+  
+  //define iterations (in a map) to count the number of cluster per module in the event
+  std::map<int, int> n_clusters_per_module;  
+  int n_clusters_total = 0;
 
-          auto itHistMap3 = DQM_Distance_XY.find(modulePair);
-          if ( itHistMap3 == DQM_Distance_XY.end() ) continue;
-          if(!test_roc_malade) itHistMap3->second->Fill (col- col2, row-row2) ;
+  for (std::map<int, TString>::iterator iter=det_id_to_module_name.begin(); iter!=det_id_to_module_name.end(); iter++) n_clusters_per_module.insert(std::pair<int, int>(iter->first, 0));
+  
+  for( edmNew::DetSetVector<SiPixelCluster>::const_iterator iDSV=pixelClusters->begin(); iDSV!=pixelClusters->end(); iDSV++) 
+  {
 
-          auto itHistMap4 = DQM_Distance_XYcm.find(modulePair);
-          if ( itHistMap4 == DQM_Distance_XYcm.end() ) continue;
-          if(!test_roc_malade) itHistMap4->second->Fill (xgb1- xgb2, ygb1-ygb2) ;
-
-        }//end for clusters2
-      }//end for cluster
-    }//end for first detectors2
-  }//end for first detectors
-
-  // Counting the number of clusters for this detector and this event
-  std::map< uint32_t, int > clustersPerModule ;
-  for ( std::map<int, TString>::iterator it = detId_to_moduleName.begin(); it != detId_to_moduleName.end(); it++ ) clustersPerModule.insert( std::pair< uint32_t, int >( it->first, 0 ) ) ;
-
-  for ( edmNew::DetSetVector< SiPixelCluster >::const_iterator DSViter=pixelclusters->begin(); DSViter!=pixelclusters->end(); DSViter++ ) {
-
-    edmNew::DetSet<SiPixelCluster>::const_iterator begin=DSViter->begin();
-    edmNew::DetSet<SiPixelCluster>::const_iterator end  =DSViter->end();
-
-    auto id = DetId(DSViter->detId());
-
-    for ( edmNew::DetSet< SiPixelCluster >::const_iterator iter=begin; iter!=end; ++iter ) {
-
-      float x = iter->x();                   // barycenter x position
-      float y = iter->y();                   // barycenter y position
-      int size = iter->size();               // total size of cluster (in pixels)
-      int sizeX = iter->sizeX();             // size of cluster in x-iterrection
-      int sizeY = iter->sizeY();             // size of cluster in y-iterrection
-
-      int row = x-0.5, col = y -0.5;
-
-        // Apply MASK
-        if ((uint32_t) id==344724484 && x>=80 && 312<= y && y<364) continue;
-
-      DQM_ClusterCharge[ id.rawId() ] -> Fill ( iter->charge() ) ;
-      DQM_ClusterSize_X[ id.rawId() ] -> Fill ( sizeY ) ;
-      DQM_ClusterSize_Y[ id.rawId() ] -> Fill ( sizeX ) ;
-      DQM_ClusterSize_XY[ id.rawId() ] -> Fill ( size ) ;
-      DQM_ClusterPosition[ id.rawId() ] -> Fill ( col, row ) ;
-
-      numberofCulster_total++;
-
-      clustersPerModule[ id.rawId() ] ++ ;
-
-    }//end for clusters in detector  
-  }//end for detectors
-
-  for ( std::map<uint32_t, int>::iterator it = clustersPerModule.begin(); it != clustersPerModule.end(); it++ ) DQM_NumbOfClusters_per_Event[ it->first ] -> Fill ( it->second ) ;
-
-
-  // Now we fill the 3D cluster tree
-  for( edmNew::DetSetVector<SiPixelCluster>::const_iterator DSViter=pixelclusters->begin(); DSViter!=pixelclusters->end();DSViter++   ) {
-
-    edmNew::DetSet<SiPixelCluster>::const_iterator begin=DSViter->begin();
-    edmNew::DetSet<SiPixelCluster>::const_iterator end  =DSViter->end();
+    edmNew::DetSet<SiPixelCluster>::const_iterator iDS_begin = iDSV->begin();
+    edmNew::DetSet<SiPixelCluster>::const_iterator iDS_end = iDSV->end();
 
     // Surface of (detId) and use the surface to convert 2D to 3D      
-    auto detId = DetId(DSViter->detId());
-    int iCluster=0;
-    const PixelGeomDetUnit *pixdet = (const PixelGeomDetUnit*) tkgeom->idToDetUnit(detId);
-    LocalPoint lp(-9999., -9999., -9999.);
+    auto det_id = DetId(iDSV->detId());
+    int n_cluster = 0;
+    
+    const PixelGeomDetUnit *pixel_geom = (const PixelGeomDetUnit*) tk_geom->idToDetUnit(det_id);
+    LocalPoint local_point(-9999., -9999., -9999.);
 
     // Then loop on the clusters of the module
-    for(edmNew::DetSet<SiPixelCluster>::const_iterator itCluster=begin;itCluster!=end;++itCluster) {
-      PixelClusterParameterEstimator::ReturnType params = cpe.getParameters(*itCluster,*pixdet);
-      lp = std::get<0>(params);
+    for(edmNew::DetSet<SiPixelCluster>::const_iterator icluster=iDS_begin; icluster!=iDS_end; ++icluster) 
+    {
+      PixelClusterParameterEstimator::ReturnType parameters = cpe.getParameters(*icluster, *pixel_geom);
+      local_point = std::get<0>(parameters);
 
-      const Surface& surface = tracker->idToDet(detId)->surface();
-      GlobalPoint gp = surface.toGlobal(lp);
+      const Surface& surface = tracker->idToDet(det_id)->surface();
+      GlobalPoint global_point = surface.toGlobal(local_point);
 
-        // Apply MASK
-        double xbary=itCluster->x();
-        double ybary=itCluster->y();
-        if ( (uint32_t) detId==344724484 && xbary>=80 && 312<= ybary && ybary<364) continue;
+      // Apply MASK
+      // Inverse x-y coordinates for CHROMini
+      double local_y = icluster->x(); // barycenter x position
+      double local_x = icluster->y();// barycenter y position
+      
+      //if ( (uint32_t) det_id==344724484 && local_x>=80 && 312<=local_y && local_y<364) continue;
+      if ( (uint32_t) det_id==344724484 && local_y>=80 && 312<=local_x && local_x<364) continue; // inverse x-y
 
-      double x=0, y=0, z=0;
-      x = gp.x();
-      y = gp.y();
-      z = gp.z();
+      double global_x=0, global_y=0, global_z=0;
+      global_x = global_point.x();
+      global_y = global_point.y();
+      global_z = global_point.z();
+      
+      hist_dqm_cluster_local_x_position[det_id]->Fill(local_x);
+      hist_dqm_cluster_local_y_position[det_id]->Fill(local_y);
+      hist_dqm_cluster_local_2d_position[det_id]->Fill(local_x, local_y);
+      
+      hist_dqm_cluster_global_x_position[det_id]->Fill(global_x);
+      hist_dqm_cluster_global_y_position[det_id]->Fill(global_y);
+      hist_dqm_cluster_global_2d_position[det_id]->Fill(global_x, global_y);
+      
+      hist_dqm_cluster_charge[det_id]->Fill(icluster->charge());
+      hist_dqm_cluster_size[det_id]->Fill(icluster->size());
+      //sizeX()
+      //sizeY()
+
+      n_clusters_per_module[det_id]++;
+      n_clusters_total++;
+
 	
       // Let's fill in the tree
-      tree_runNumber = myEvId.run();
-      tree_lumiSection = myEvId.luminosityBlock();
-      tree_event = myEvId.event();
-      tree_detId = detId;
-      tree_cluster = iCluster++;	
-      tree_charge = itCluster->charge();	
-      tree_size = itCluster->size();	
-      tree_x = x;
-      tree_y = y;
-      tree_z = z;
-      tree_modName = detId_to_moduleName[detId];
-      cluster3DTree->Fill();
-
-      } //end for clusters of the first detector
-    } //end for first detectors
-      
-  DQM_NumbOfCluster_Tot->Fill(numberofCulster_total);
-//  if(numberofCulster_total != 0 ) std::cout << "number of cluster " << numberOfClusters << std::endl;
+      tree_run_number = event_id.run();
+      tree_lumi_section = event_id.luminosityBlock();
+      tree_event = event_id.event();
+      tree_det_id = det_id;
+      tree_module_name = det_id_to_module_name[det_id];
+      tree_n_clusters = n_cluster++;	
+      tree_cluster_charge = icluster->charge();	
+      tree_cluster_size = icluster->size();
+      tree_cluster_local_x_position = local_x;
+      tree_cluster_local_y_position = local_y;
+      tree_cluster_global_x_position = global_x;
+      tree_cluster_global_y_position = global_y;
+      tree_cluster_global_z_position = global_z;
+      cluster_tree->Fill();
   
+
+     } //end for cluster of the first detector
+    } //end for first detector
+    
+  hist_n_clusters_tot->Fill(n_clusters_total);
+  
+  //fill the number of cluster in the event per module
+  for (std::map<int, int>::iterator iter=n_clusters_per_module.begin(); iter!=n_clusters_per_module.end(); iter++) hist_dqm_n_clusters[iter->first]->Fill(iter->second);
   
   //---------------------------------
   //loop on hits
   //---------------------------------
-  
+  /*
   for( edmNew::DetSetVector<SiPixelRecHit>::const_iterator DSViter=pixelhits->begin(); DSViter!=pixelhits->end(); DSViter++   ) {
       
     edmNew::DetSet<SiPixelRecHit>::const_iterator begin=DSViter->begin();
@@ -662,6 +702,8 @@ AnaChromini::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
          
     }//end for DetSet
   }//end for DetSetVector
+  
+  */
 }//end analyze()
 
 

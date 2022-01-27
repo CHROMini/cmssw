@@ -52,25 +52,31 @@
     <Constant name="Plane1TiltAngle" value="[tuneParameters:PlaneTiltAngle]"/>
     <Constant name="Plane1SkewAngle" value="[tuneParameters:PlaneSkewAngle]"/>
     <Constant name="Plane1OrientationAngle" value="[tuneParameters:PlaneOrientationAngle]"/>
-    <Constant name="Plane1CenterX" value="0.*mm"/>
-    <Constant name="Plane1CenterY" value="0.*mm"/>
+    <Constant name="Plane1CenterX" value="-500.*mm"/>
+    <Constant name="Plane1CenterY" value="-500.*mm"/>
     <Constant name="Plane1CenterZ" value="-75.0*mm"/>
 
     <!-- Plane 2 -->
     <Constant name="Plane2TiltAngle" value="[tuneParameters:PlaneTiltAngle]"/>
     <Constant name="Plane2SkewAngle" value="[tuneParameters:PlaneSkewAngle]"/>
     <Constant name="Plane2OrientationAngle" value="[tuneParameters:PlaneOrientationAngle]"/>
-    <Constant name="Plane2CenterX" value="0.*mm"/>
-    <Constant name="Plane2CenterY" value="0.*mm"/>
-    <Constant name="Plane2CenterZ" value="-25.0*mm"/>
+    <Constant name="Plane2CenterX" value="-11.7*mm"/>
+    <Constant name="Plane2CenterY" value="7.3*mm"/>
+    <Constant name="Plane2CenterZ" value="-22.0*mm"/>
+    <!--Constant name="Plane2CenterX" value="0.*mm"/-->
+    <!--Constant name="Plane2CenterY" value="0.*mm"/-->
+    <!--Constant name="Plane2CenterZ" value="-25.0*mm"/-->
 
     <!-- Plane 3 -->
     <Constant name="Plane3TiltAngle" value="[tuneParameters:PlaneTiltAngle]"/>
     <Constant name="Plane3SkewAngle" value="[tuneParameters:PlaneSkewAngle]"/>
     <Constant name="Plane3OrientationAngle" value="[tuneParameters:PlaneOrientationAngle]"/>
-    <Constant name="Plane3CenterX" value="0.*mm"/>
-    <Constant name="Plane3CenterY" value="0.*mm"/>
-    <Constant name="Plane3CenterZ" value="25.0*mm"/>
+    <Constant name="Plane3CenterX" value="-11.7*mm"/>
+    <Constant name="Plane3CenterY" value="7.3*mm"/>
+    <Constant name="Plane3CenterZ" value="11.0*mm"/>
+    <!--Constant name="Plane3CenterX" value="0.*mm"/-->
+    <!--Constant name="Plane3CenterY" value="0.*mm"/-->
+    <!--Constant name="Plane3CenterZ" value="25.0*mm"/-->
 
     <!-- Plane 4 -->
     <Constant name="Plane4TiltAngle" value="[tuneParameters:PlaneTiltAngle]"/>

@@ -8,6 +8,7 @@ process.load("FWCore.MessageService.MessageLogger_cfi")
 process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(100) )
 
 # Input source
+#process.source = cms.Source("PoolSource",
 process.source = cms.Source("NewEventStreamFileReader",
     fileNames = cms.untracked.vstring( 'file:'+sys.argv[-1])
 )
